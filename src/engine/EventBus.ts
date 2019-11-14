@@ -1,32 +1,66 @@
-type SubscriptionFn = (data: object) => void
+import { ReadonlyVec2 } from 'engine/Vec2';
 
-interface EventSubscription {
-    event: GameEvent;
-    fn: SubscriptionFn;
+type Listener<Args extends any[] = []> = (...args: Args) => void;
+export type UnsubscribeFn = () => void;
+
+// Create symbols for message types and add some overloads to the publish and subscribe methods.
+export const MouseClick = Symbol('MouseClick');
+export const MouseMove = Symbol('MouseMove');
+
+// Define some data type for the messages.
+export interface MouseEventData {
+    position: ReadonlyVec2;
 }
 
-export enum GameEvent {
-    MouseClick,
-    MouseMove
+export class EventBus {
+    private subscriptions = new Map<symbol, Listener<any>[]>();
+
+    // Method overloads to get type safety on subscribe method.
+    public subscribe(event: typeof MouseClick, fn: Listener<[MouseEventData]>): UnsubscribeFn;
+    public subscribe(event: typeof MouseMove, fn: Listener<[MouseEventData]>): UnsubscribeFn;
+
+    /**
+     * Subscribe to an event to be notified when a specific event is emitted.
+     * Events that were submitted before this subscription was created will not be received.
+     * @param event The event you wish to listen for.
+     * @param fn The function to be called when the event is emitted.
+     */
+    public subscribe(event: symbol, fn: Listener<any>): UnsubscribeFn {
+        const listeners = this.subscriptions.get(event) || [];
+        const index = listeners.length;
+
+        listeners.push(fn);
+        this.subscriptions.set(event, listeners);
+
+        return this.createUnsubscribeFn(event, index);
+    }
+
+    // Method overloads to get type safety on publish method.
+    public publish(event: typeof MouseClick, mouseEventData: MouseEventData): void;
+    public publish(event: typeof MouseMove, mouseEventData: MouseEventData): void;
+
+    /**
+     * Publish events and trigger the listener functions.
+     * @param event The event you to publish.
+     * @param data Any data that needs to be emitted with the event.
+     */
+    public publish(event: symbol, ...data: any[]): void {
+        const listeners = this.subscriptions.get(event) || [];
+
+        for (const listener of listeners) {
+            // Use requestAnimationFrame to cause the listeners to be executed asynchronously.
+            requestAnimationFrame(() => listener(...data));
+        }
+    }
+
+    private createUnsubscribeFn(event: symbol, index: number): UnsubscribeFn {
+        return () => {
+            const listeners = this.subscriptions.get(event) || [];
+            listeners.splice(index, 1);
+            this.subscriptions.set(event, listeners);
+        };
+    }
 }
 
-export namespace EventBus {
-
-    const subscriptions = new Map<symbol, EventSubscription>();
-
-    export function subscribe(event: GameEvent, fn: SubscriptionFn): symbol {
-        const id = Symbol();
-        subscriptions.set(id,{ event, fn });
-        return id;
-    }
-
-    export function unsubscribe(id: symbol) {
-        subscriptions.delete(id)
-    }
-
-    export function publish(event: GameEvent, data: any) {
-        [...subscriptions.values()]
-            .filter((e: EventSubscription) => e.event === event)
-            .forEach((e) => e.fn(data));
-    }
-}
+// The global message bus instance.
+export const eventBus = new EventBus();

@@ -1,42 +1,52 @@
 import { Kitchen } from './Kitchen';
-import { EventBus, GameEvent } from './engine';
+import { MouseEventData, eventBus, MouseClick, MouseMove } from 'engine/EventBus';
+import { Vec2 } from 'engine/Vec2';
 
-function sizeCanvas(canvas: HTMLCanvasElement) {
-    canvas.width = window.innerWidth;
-    canvas.style.width = canvas.width + 'px';
-    canvas.height = window.innerHeight;
-    canvas.style.height = canvas.height + 'px'
-};
-
-function createCanvas (): HTMLCanvasElement {
+/**
+ * Creates the canvas element and initialises the event listeners for user input.
+ */
+function createAndInitialiseCanvas(): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
-    canvas.id = 'canvas';
     document.body.appendChild(canvas);
-    sizeCanvas(canvas);
-    canvas.style.margin = '0';
 
-    canvas.addEventListener('click', (e) => {
-        const rect = canvas.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
-        EventBus.publish(GameEvent.MouseClick, { x, y });
+    const mouseEventData: MouseEventData = {
+        position: new Vec2(0, 0),
+    };
+
+    canvas.addEventListener('click', (mouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        (mouseEventData.position as Vec2).x = mouseEvent.clientX - rect.left;
+        (mouseEventData.position as Vec2).z = mouseEvent.clientY - rect.top;
+        eventBus.publish(MouseClick, mouseEventData);
+    });
+
+    canvas.addEventListener('mousemove', (mouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        (mouseEventData.position as Vec2).x = mouseEvent.clientX - rect.left;
+        (mouseEventData.position as Vec2).z = mouseEvent.clientY - rect.top;
+        eventBus.publish(MouseMove, mouseEventData);
     });
 
     return canvas;
-};
+}
 
-function init(): void {
+/**
+ * Entry point
+ */
+function main(): void {
     document.body.style.margin = '0';
-    const canvas = createCanvas();
-    const ctx = canvas.getContext('2d');
-    const kitchen = new Kitchen();
-    const draw = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        kitchen.draw(ctx);
-        window.requestAnimationFrame(draw);
-    };
-    draw();
-};
 
-window.addEventListener('DOMContentLoaded', () => init());
-window.addEventListener('resize', (e: Event) => sizeCanvas(e.target as HTMLCanvasElement));
+    const canvas = createAndInitialiseCanvas();
+    const context = canvas.getContext('2d')!;
+    const kitchen = new Kitchen();
+
+    const mainLoop = () => {
+        kitchen.update();
+        kitchen.render(context);
+        requestAnimationFrame(mainLoop);
+    };
+
+    mainLoop();
+}
+
+window.addEventListener('DOMContentLoaded', main);

@@ -1,20 +1,47 @@
-import { Unit } from './widgets/Unit';
-import { IRenderable } from './engine';
+import { Widget } from 'widgets/Widget';
+import { BaseUnitWidget } from 'widgets/BaseUnitWidget';
+import { Transform } from 'engine/Transform';
+import { Vec3 } from 'engine/Vec3';
 
 export class Kitchen {
-    public items = new Array<IRenderable>();
+    private widgets = new Array<Widget>();
 
     constructor() {
-        const unit1 = new Unit(100, 90);
+        const unit1 = new BaseUnitWidget(
+            new Transform(
+                new Vec3(50, 0, 50),
+                Vec3.Zero(),
+                Vec3.PositiveOne(),
+            ),
+            80,
+            87,
+            57,
+        );
 
-        const unit2 = new Unit(100, 90);
-        unit2.setPosition(100, 0);
+        const unit2 = new BaseUnitWidget(
+            new Transform(
+                new Vec3(150, 0, 50),
+                Vec3.Zero(),
+                Vec3.PositiveOne(),
+            ),
+            80,
+            87,
+            57,
+        );
 
-        this.items.push(unit1);
-        this.items.push(unit2);
+        this.widgets.push(unit1);
+        this.widgets.push(unit2);
     }
 
-    public draw(ctx: CanvasRenderingContext2D): void {
-        this.items.forEach(a => a.draw(ctx));
+    public update(): void {
+        for (const widget of this.widgets) {
+            widget.update();
+        }
+    }
+
+    public render(context: CanvasRenderingContext2D): void {
+        for (const widget of this.widgets) {
+            widget.render(context);
+        }
     }
 }
