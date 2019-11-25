@@ -1,10 +1,11 @@
 import { Widget } from 'widgets/Widget';
+import { EventBus } from 'engine/EventBus';
 
 export class BaseUnitWidget extends Widget {
     protected fillColour = '#2bb673';
     protected borderColour = '#000';
 
-    public update() {
+    public update(_eventBus: EventBus) {
 
     }
 

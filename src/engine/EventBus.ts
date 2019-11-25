@@ -4,7 +4,7 @@ type Listener<Args extends any[] = []> = (...args: Args) => void;
 export type UnsubscribeFn = () => void;
 
 // Create symbols for message types and add some overloads to the publish and subscribe methods.
-export const MouseClick = Symbol('MouseClick');
+export const MouseDown = Symbol('MouseDown');
 export const MouseMove = Symbol('MouseMove');
 
 // Define some data type for the messages.
@@ -16,7 +16,7 @@ export class EventBus {
     private subscriptions = new Map<symbol, Listener<any>[]>();
 
     // Method overloads to get type safety on subscribe method.
-    public subscribe(event: typeof MouseClick, fn: Listener<[MouseEventData]>): UnsubscribeFn;
+    public subscribe(event: typeof MouseDown, fn: Listener<[MouseEventData]>): UnsubscribeFn;
     public subscribe(event: typeof MouseMove, fn: Listener<[MouseEventData]>): UnsubscribeFn;
 
     /**
@@ -36,7 +36,7 @@ export class EventBus {
     }
 
     // Method overloads to get type safety on publish method.
-    public publish(event: typeof MouseClick, mouseEventData: MouseEventData): void;
+    public publish(event: typeof MouseDown, mouseEventData: MouseEventData): void;
     public publish(event: typeof MouseMove, mouseEventData: MouseEventData): void;
 
     /**
@@ -61,6 +61,3 @@ export class EventBus {
         };
     }
 }
-
-// The global message bus instance.
-export const eventBus = new EventBus();

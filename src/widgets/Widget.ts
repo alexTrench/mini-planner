@@ -1,7 +1,7 @@
 import { Transform, ReadonlyTransform } from 'engine/Transform';
 import { BoundingBox, ReadonlyBoundingBox } from 'engine/BoundingBox';
 import { ReadonlyVec3, Vec3 } from 'engine/Vec3';
-import { eventBus, MouseClick, MouseEventData, MouseMove } from 'engine/EventBus';
+import { EventBus, MouseDown, MouseEventData, MouseMove } from 'engine/EventBus';
 // import { ReadonlyVec2 } from 'engine/Vec2';
 
 export abstract class Widget {
@@ -14,6 +14,7 @@ export abstract class Widget {
     // Maybe add other colours for things?
 
     public constructor(
+        eventBus: EventBus,
         private _transform: Transform,
         width: number,
         depth: number,
@@ -28,7 +29,7 @@ export abstract class Widget {
             depth * 0.5,
         );
 
-        eventBus.subscribe(MouseClick, this.handleMouseClick);
+        eventBus.subscribe(MouseDown, this.handleMouseClick);
         eventBus.subscribe(MouseMove, this.handleMouseMove);
     }
 
@@ -123,6 +124,6 @@ export abstract class Widget {
         this._transform.scale.z = z;
     }
 
-    public abstract update(): void;
+    public abstract update(eventBus: EventBus): void;
     public abstract render(context: CanvasRenderingContext2D): void;
 }

@@ -2,12 +2,14 @@ import { Widget } from 'widgets/Widget';
 import { BaseUnitWidget } from 'widgets/BaseUnitWidget';
 import { Transform } from 'engine/Transform';
 import { Vec3 } from 'engine/Vec3';
+import { EventBus } from 'engine/EventBus';
 
 export class Kitchen {
     private widgets = new Array<Widget>();
 
-    constructor() {
+    constructor(eventBus: EventBus) {
         const unit1 = new BaseUnitWidget(
+            eventBus,
             new Transform(
                 new Vec3(50, 0, 50),
                 Vec3.Zero(),
@@ -19,6 +21,7 @@ export class Kitchen {
         );
 
         const unit2 = new BaseUnitWidget(
+            eventBus,
             new Transform(
                 new Vec3(150, 0, 50),
                 Vec3.Zero(),
@@ -33,9 +36,9 @@ export class Kitchen {
         this.widgets.push(unit2);
     }
 
-    public update(): void {
+    public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
-            widget.update();
+            widget.update(eventBus);
         }
     }
 
