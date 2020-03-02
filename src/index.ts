@@ -10,20 +10,20 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     document.body.appendChild(canvas);
 
     const mouseEventData: MouseEventData = {
-        position: new Vec2(0, 0),
+        position: Vec2.New(0, 0),
     };
 
     canvas.addEventListener('mousedown', (mouseEvent) => {
         const rect = canvas.getBoundingClientRect();
-        (mouseEventData.position as Vec2).x = mouseEvent.clientX - rect.left;
-        (mouseEventData.position as Vec2).z = mouseEvent.clientY - rect.top;
+        mouseEventData.position.x = mouseEvent.clientX - rect.left;
+        mouseEventData.position.y = mouseEvent.clientY - rect.top;
         eventBus.publish(MouseDown, mouseEventData);
     });
 
     canvas.addEventListener('mousemove', (mouseEvent) => {
         const rect = canvas.getBoundingClientRect();
-        (mouseEventData.position as Vec2).x = mouseEvent.clientX - rect.left;
-        (mouseEventData.position as Vec2).z = mouseEvent.clientY - rect.top;
+        mouseEventData.position.x = mouseEvent.clientX - rect.left;
+        mouseEventData.position.y = mouseEvent.clientY - rect.top;
         eventBus.publish(MouseMove, mouseEventData);
     });
 

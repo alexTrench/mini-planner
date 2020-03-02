@@ -1,4 +1,4 @@
-import { ReadonlyVec2 } from 'engine/Vec2';
+import { Vec2 } from 'engine/Vec2';
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
 export type UnsubscribeFn = () => void;
@@ -9,11 +9,22 @@ export const MouseMove = Symbol('MouseMove');
 
 // Define some data type for the messages.
 export interface MouseEventData {
-    position: ReadonlyVec2;
+    position: Vec2;
+}
+
+function createUnsubscribeFn(subscriptions: Map<symbol, Set<Listener<any>>>, event: symbol, fn: Listener<any>): UnsubscribeFn {
+    return () => {
+        const listeners = subscriptions.get(event);
+
+        if (listeners) {
+            listeners.delete(fn);
+            subscriptions.set(event, listeners);
+        }
+    };
 }
 
 export class EventBus {
-    private subscriptions = new Map<symbol, Listener<any>[]>();
+    private subscriptions = new Map<symbol, Set<Listener<any>>>();
 
     // Method overloads to get type safety on subscribe method.
     public subscribe(event: typeof MouseDown, fn: Listener<[MouseEventData]>): UnsubscribeFn;
@@ -26,13 +37,12 @@ export class EventBus {
      * @param fn The function to be called when the event is emitted.
      */
     public subscribe(event: symbol, fn: Listener<any>): UnsubscribeFn {
-        const listeners = this.subscriptions.get(event) || [];
-        const index = listeners.length;
+        const listeners = this.subscriptions.get(event) || new Set();
 
-        listeners.push(fn);
+        listeners.add(fn);
         this.subscriptions.set(event, listeners);
 
-        return this.createUnsubscribeFn(event, index);
+        return createUnsubscribeFn(this.subscriptions, event, fn);
     }
 
     // Method overloads to get type safety on publish method.
@@ -51,13 +61,5 @@ export class EventBus {
             // Use requestAnimationFrame to cause the listeners to be executed asynchronously.
             requestAnimationFrame(() => listener(...data));
         }
-    }
-
-    private createUnsubscribeFn(event: symbol, index: number): UnsubscribeFn {
-        return () => {
-            const listeners = this.subscriptions.get(event) || [];
-            listeners.splice(index, 1);
-            this.subscriptions.set(event, listeners);
-        };
     }
 }
