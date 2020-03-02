@@ -30,6 +30,8 @@ module.exports = {
         port: 9000,
     },
     plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            title: "Kitchen Planner",
+        }),
     ],
 };
