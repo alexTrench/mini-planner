@@ -1,11 +1,11 @@
-import { Vec3 } from 'engine/Vec3';
-import { Mat4 } from 'engine/Mat4';
+import { Vec3 } from "engine/Vec3";
+import { Mat4 } from "engine/Mat4";
 
 export class Transform {
     public constructor(
         public translation: Vec3,
         public rotation: number,
-        public scale: Vec3,
+        public scale: Vec3
     ) {}
 
     public getTransformationMatrix(): Mat4 {

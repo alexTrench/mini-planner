@@ -1,5 +1,6 @@
 import { Widget } from "widgets/Widget";
 import { BaseUnitWidget } from "widgets/BaseUnitWidget";
+import { WorktopWidget } from "widgets/WorktopWidget";
 import { EventBus } from "engine/EventBus";
 import { Transform } from "engine/Transform";
 import { Vec3 } from "engine/Vec3";
@@ -125,6 +126,29 @@ export class Kitchen {
             Vec3.New(600, 1920, 450)
         );
 
+        // Worktops
+        const worktopSize: Vec3 = Vec3.New(3000, 40, 600);
+
+        // Worktop Widget African Teak Border
+        const africanTeakColour = "#E8A818";
+        const worktopWidgetAfrican = new WorktopWidget(
+            eventBus,
+            new Transform(Vec3.New(400, 0, 1000), 0, scaleVector),
+            worktopSize,
+            africanTeakColour
+        );
+
+        // Worktop Widget Vemeer Border
+        const vemeerColour = "#44B84A";
+        const worktopWidgetVemeer = new WorktopWidget(
+            eventBus,
+            new Transform(Vec3.New(1400, 0, 1000), 0, scaleVector),
+            worktopSize,
+            vemeerColour
+        );
+
+        // Work
+
         // Add widgets to this array
         this.addToWidgets(
             baseUnitWidgetA,
@@ -138,7 +162,9 @@ export class Kitchen {
             decorForTowerUnit1,
             decorForTowerUnit2,
             TowerUnitWidget1,
-            TowerUnitWidget2
+            TowerUnitWidget2,
+            worktopWidgetAfrican,
+            worktopWidgetVemeer
         );
     }
 
@@ -153,7 +179,6 @@ export class Kitchen {
             widget.render(context);
         }
     }
-
     public addToWidgets(...newWidgets: Widget[]): void {
         this.widgets.push(...newWidgets);
     }
