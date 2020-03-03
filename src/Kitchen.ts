@@ -187,6 +187,11 @@ export class Kitchen {
     public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
             widget.update(eventBus);
+            for (const widgetB of this.widgets) {
+                if (widget !== widgetB) {
+                    widget.hasCollided(widgetB.getBox());
+                }
+            }
         }
     }
 

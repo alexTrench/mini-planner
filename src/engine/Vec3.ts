@@ -66,6 +66,25 @@ export class Vec3 {
     }
 
     // Extend me with useful methods like dot, normalise, add, etc...
+    public subInPlace(other: Vec3): this {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
+    }
+    public sub(other: Vec3): Vec3 {
+        return this.clone().subInPlace(other);
+    }
+    public absInPlace(): this {
+        this.x = Math.abs(this.x);
+        this.y = Math.abs(this.y);
+        this.z = Math.abs(this.z);
+        return this;
+    }
+
+    public abs(): Vec3 {
+        return this.clone().absInPlace();
+    }
 
     public addInPlace(other: Vec3): this {
         this.x += other.x;

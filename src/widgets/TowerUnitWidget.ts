@@ -1,11 +1,12 @@
-import { Widget } from "./Widget";
-import { Vec3 } from "../engine/Vec3";
-import { EventBus } from "../engine/EventBus";
-import { Transform } from "../engine/Transform";
+import { Widget } from "widgets/Widget";
+import { Vec3 } from "engine/Vec3";
+import { EventBus } from "engine/EventBus";
+import { Transform } from "engine/Transform";
 
 export class TowerUnitWidget extends Widget {
     protected fillColour: string;
     protected borderColour: string;
+
     constructor(
         eventBus: EventBus,
         public transform: Transform,
@@ -24,8 +25,11 @@ export class TowerUnitWidget extends Widget {
     }
 
     public render(context: CanvasRenderingContext2D): void {
-
-        this.renderTwoDimensionPolygon(context, this.fillColour, this.borderColour);
+        this.renderTwoDimensionPolygon(
+            context,
+            this.fillColour,
+            this.borderColour
+        );
     }
     public toJSON(): string {
         return "";

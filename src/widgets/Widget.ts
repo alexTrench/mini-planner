@@ -6,24 +6,45 @@ import {
     MouseEventData,
     MouseMove
 } from "engine/EventBus";
-import {Vec2} from "../engine/Vec2";
+import { Vec2 } from "../engine/Vec2";
+import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
 
 export abstract class Widget {
     protected isSelected = false;
     protected isHovered = false;
-
     protected abstract fillColour: string;
     protected abstract borderColour: string;
+
     // Maybe add other colours for things?
+    boundingBox: AxisAlignedBoundingBox;
 
     public constructor(
         eventBus: EventBus,
         public transform: Transform,
         public dimensions: Vec3,
-        protected id:number
+        protected id: number
     ) {
         eventBus.subscribe(MouseDown, this.handleMouseClick.bind(this));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
+
+        this.boundingBox = new AxisAlignedBoundingBox(
+            this.dimensions.x / 2,
+            this.dimensions.y / 2,
+            this.dimensions.z / 2,
+            new Transform(
+                Vec3.New(
+                    this.transform.translation.x,
+                    this.transform.translation.y,
+                    this.transform.translation.z
+                ),
+                this.transform.rotation,
+                Vec3.New(
+                    this.transform.scale.x,
+                    this.transform.scale.y,
+                    this.transform.scale.z
+                )
+            )
+        );
     }
 
     public handleMouseClick(_mouse: MouseEventData): void {}
@@ -54,8 +75,11 @@ export abstract class Widget {
     /*
        To be used in rendering Vec2 widgets
      */
-    public renderTwoDimensionPolygon(context: CanvasRenderingContext2D, fillColour: string, borderColour: string) {
-
+    public renderTwoDimensionPolygon(
+        context: CanvasRenderingContext2D,
+        fillColour: string,
+        borderColour: string
+    ) {
         const halfWidth = this.dimensions.x / 2;
         const halfHeight = this.dimensions.z / 2;
 
@@ -86,10 +110,43 @@ export abstract class Widget {
         context.stroke();
         context.fill();
 
-    }
+        // temp drawing of bounding box - uncomment the below to draw bounding boxes
 
+        // const polygon2 = [
+        //     Vec2.New(-this.boundingBox.halfWidth, -this.boundingBox.halfDepth),
+        //     Vec2.New(this.boundingBox.halfWidth, -this.boundingBox.halfDepth),
+        //     Vec2.New(this.boundingBox.halfWidth, this.boundingBox.halfDepth),
+        //     Vec2.New(-this.boundingBox.halfWidth, this.boundingBox.halfDepth)
+        // ];
+
+        // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
+
+        // for (const point of polygon2) {
+        //     point.transformInPlace(transformMatrix2);
+        // }
+
+        // context.beginPath();
+        // context.moveTo(polygon2[0].x, polygon2[0].z);
+        // for (const point of polygon2) {
+        //     context.lineTo(point.x, point.z);
+        // }
+        // context.closePath();
+        // context.fillStyle = "red";
+        // context.fill();
+        // context.strokeStyle = "black";
+        // context.stroke();
+    }
 
     public abstract update(eventBus: EventBus): void;
     public abstract render(context: CanvasRenderingContext2D): void;
     public abstract toJSON(): string;
+
+    public hasCollided(box: AxisAlignedBoundingBox) {
+        let isCollided = box.intersectsBoundingBox(this.boundingBox);
+        console.log(isCollided);
+    }
+
+    public getBox(): AxisAlignedBoundingBox {
+        return this.boundingBox;
+    }
 }
