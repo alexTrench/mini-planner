@@ -1,3 +1,5 @@
+//prettier-ignore
+
 export class Mat4 {
     public static WIDTH = 4;
 

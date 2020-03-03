@@ -1,6 +1,5 @@
 import { Widget } from 'widgets/Widget';
 import { EventBus } from 'engine/EventBus';
-
 export class Kitchen {
     private widgets = new Array<Widget>();
 
