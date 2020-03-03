@@ -1,4 +1,4 @@
-import { Mat4 } from 'engine/Mat4';
+import { Mat4 } from "engine/Mat4";
 
 export class Vec3 {
     private data!: Float32Array;
@@ -46,12 +46,24 @@ export class Vec3 {
         return Vec3.New(0.0, 0.0, -1.0);
     }
 
-    public get x(): number { return this.data[0]; }
-    public get y(): number { return this.data[1]; }
-    public get z(): number { return this.data[2]; }
-    public set x(value: number) { this.data[0] = value; }
-    public set y(value: number) { this.data[1] = value; }
-    public set z(value: number) { this.data[2] = value; }
+    public get x(): number {
+        return this.data[0];
+    }
+    public get y(): number {
+        return this.data[1];
+    }
+    public get z(): number {
+        return this.data[2];
+    }
+    public set x(value: number) {
+        this.data[0] = value;
+    }
+    public set y(value: number) {
+        this.data[1] = value;
+    }
+    public set z(value: number) {
+        this.data[2] = value;
+    }
 
     // Extend me with useful methods like dot, normalise, add, etc...
 

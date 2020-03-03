@@ -12,8 +12,8 @@ import { Vec2 } from "engine/Vec2";
  */
 function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     const canvas = document.createElement("canvas");
-    canvas.setAttribute("height", "1500");
-    canvas.setAttribute("width", "2000");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
     document.body.appendChild(canvas);
 
     const mouseEventData: MouseEventData = {
@@ -49,6 +49,7 @@ function main(): void {
     const kitchen = new Kitchen(eventBus);
 
     const mainLoop = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
         kitchen.update(eventBus);
         kitchen.render(context);
         requestAnimationFrame(mainLoop);

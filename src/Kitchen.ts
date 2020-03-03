@@ -4,6 +4,7 @@ import { EventBus } from "engine/EventBus";
 import { Transform } from "engine/Transform";
 import { Vec3 } from "engine/Vec3";
 import { WallUnitWidget } from "widgets/WallUnitWidget";
+import { DecorPanelWidget } from "widgets/DecorPanelWidget";
 
 export class Kitchen {
     private widgets = new Array<Widget>();
@@ -44,12 +45,84 @@ export class Kitchen {
             wallUnitSizeB
         );
 
+        const decorForBaseUnitA = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(30, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 720, 620)
+        );
+
+        const decorForBaseUnitB = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(50, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 720, 430)
+        );
+
+        const decorForWallUnitA = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(70, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 720, 400)
+        );
+
+        const decorForWallUnitB = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(90, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 720, 330)
+        );
+
+        const decorForTowerUnit1 = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(110, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 1920, 620)
+        );
+
+        const decorForTowerUnit2 = new DecorPanelWidget(
+            eventBus,
+            new Transform(
+                Vec3.New(130, 0, 2100 * 0.2),
+                0,
+                Vec3.New(0.2, 0.2, 0.2)
+            ),
+            //    w: x, h: y, d: z
+            Vec3.New(20, 1920, 450)
+        );
+
         // Add widgets to this array
         this.addToWidgets(
             baseUnitWidgetA,
             baseUnitWidgetB,
             wallUnitWidgetA,
-            wallUnitWidgetB
+            wallUnitWidgetB,
+            decorForBaseUnitA,
+            decorForBaseUnitB,
+            decorForWallUnitA,
+            decorForWallUnitB,
+            decorForTowerUnit1,
+            decorForTowerUnit2
         );
     }
 

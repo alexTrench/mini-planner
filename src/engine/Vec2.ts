@@ -74,6 +74,7 @@ export class Vec2 {
     public transformInPlace(matrix: Mat4): this {
         const { x, z } = this;
         const w = 1;
+<<<<<<< HEAD
 
         this.x =
             x * matrix.at(0, 0)! +
@@ -84,6 +85,18 @@ export class Vec2 {
         this.z =
             x * matrix.at(2, 0)! +
             // y = 0; gone.
+=======
+        const y = 0;
+
+        this.x =
+            x * matrix.at(0, 0)! +
+            y * matrix.at(0, 1)! + // should this be here?
+            z * matrix.at(0, 2)! +
+            w * matrix.at(0, 3)!;
+        this.z =
+            x * matrix.at(2, 0)! +
+            y * matrix.at(2, 1)! + // should this be here?
+>>>>>>> acff8e7... ACT-3 create shape from lines instead of rect
             z * matrix.at(2, 2)! +
             w * matrix.at(2, 3)!;
 
