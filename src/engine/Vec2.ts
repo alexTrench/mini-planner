@@ -1,4 +1,4 @@
-import {Mat4} from "./Mat4";
+import { Mat4 } from "engine/Mat4";
 
 export class Vec2 {
     private data!: Float32Array;
@@ -46,10 +46,18 @@ export class Vec2 {
         return Vec2.New(0.0, 0.0);
     }
 
-    public get x(): number { return this.data[0]; }
-    public get z(): number { return this.data[1]; }
-    public set x(value: number) { this.data[0] = value; }
-    public set z(value: number) { this.data[1] = value; }
+    public get x(): number {
+        return this.data[0];
+    }
+    public get z(): number {
+        return this.data[1];
+    }
+    public set x(value: number) {
+        this.data[0] = value;
+    }
+    public set z(value: number) {
+        this.data[1] = value;
+    }
 
     // Extend me with useful methods like dot, normalise, add, etc...
 
@@ -80,6 +88,10 @@ export class Vec2 {
             w * matrix.at(2, 3)!;
 
         return this;
+    }
+
+    public transform(matrix: Mat4): Vec2 {
+        return this.clone().transformInPlace(matrix);
     }
 
     /**

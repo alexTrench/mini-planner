@@ -1,6 +1,11 @@
-import { Transform } from 'engine/Transform';
-import { Vec3 } from 'engine/Vec3';
-import { EventBus, MouseDown, MouseEventData, MouseMove } from 'engine/EventBus';
+import { Transform } from "engine/Transform";
+import { Vec3 } from "engine/Vec3";
+import {
+    EventBus,
+    MouseDown,
+    MouseEventData,
+    MouseMove
+} from "engine/EventBus";
 
 export abstract class Widget {
     protected isSelected = false;
@@ -13,10 +18,10 @@ export abstract class Widget {
     public constructor(
         eventBus: EventBus,
         public transform: Transform,
-        public dimensions: Vec3,
+        public dimensions: Vec3
     ) {
-        eventBus.subscribe(MouseDown, this.handleMouseClick);
-        eventBus.subscribe(MouseMove, this.handleMouseMove);
+        eventBus.subscribe(MouseDown, this.handleMouseClick.bind(this));
+        eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
     }
 
     public handleMouseClick(_mouse: MouseEventData): void {}
