@@ -70,9 +70,21 @@ export class Vec3 {
         const { x, y, z } = this;
         const w = 1;
 
-        this.x = x * matrix.at(0, 0)! + y * matrix.at(0, 1)! + z * matrix.at(0, 2)! + w * matrix.at(0, 3)!
-        this.y = x * matrix.at(1, 0)! + y * matrix.at(1, 1)! + z * matrix.at(1, 2)! + w * matrix.at(1, 3)!
-        this.z = x * matrix.at(2, 0)! + y * matrix.at(2, 1)! + z * matrix.at(2, 2)! + w * matrix.at(2, 3)!
+        this.x =
+            x * matrix.at(0, 0)! +
+            y * matrix.at(0, 1)! +
+            z * matrix.at(0, 2)! +
+            w * matrix.at(0, 3)!;
+        this.y =
+            x * matrix.at(1, 0)! +
+            y * matrix.at(1, 1)! +
+            z * matrix.at(1, 2)! +
+            w * matrix.at(1, 3)!;
+        this.z =
+            x * matrix.at(2, 0)! +
+            y * matrix.at(2, 1)! +
+            z * matrix.at(2, 2)! +
+            w * matrix.at(2, 3)!;
 
         return this;
     }

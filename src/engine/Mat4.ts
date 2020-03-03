@@ -27,10 +27,10 @@ export class Mat4 {
         const mat4 = new Mat4();
 
         mat4.data = new Float32Array([
-            1.0, 0.0, 0.0, x,
-            0.0, 1.0, 0.0, y,
-            0.0, 0.0, 1.0, z,
-            0.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            x  , y  , z  , 1.0,
         ]);
 
         return mat4;
@@ -42,9 +42,9 @@ export class Mat4 {
         const sy = Math.sin(y);
 
         mat4.data = new Float32Array([
-            cy , 0.0, sy , 0.0,
+            cy , 0.0, -sy, 0.0,
             0.0, 1.0, 0.0, 0.0,
-            -sy, 0.0, cy , 0.0,
+            sy , 0.0, cy , 0.0,
             0.0, 0.0, 0.0, 1.0,
         ]);
 
@@ -58,7 +58,7 @@ export class Mat4 {
             x  , 0.0, 0.0, 0.0,
             0.0, y  , 0.0, 0.0,
             0.0, 0.0, z  , 0.0,
-            0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0,
         ]);
 
         return mat4;

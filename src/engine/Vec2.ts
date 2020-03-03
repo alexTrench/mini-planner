@@ -1,3 +1,5 @@
+import {Mat4} from "./Mat4";
+
 export class Vec2 {
     private data!: Float32Array;
     private constructor() {}
@@ -45,20 +47,39 @@ export class Vec2 {
     }
 
     public get x(): number { return this.data[0]; }
-    public get y(): number { return this.data[1]; }
+    public get z(): number { return this.data[1]; }
     public set x(value: number) { this.data[0] = value; }
-    public set y(value: number) { this.data[1] = value; }
+    public set z(value: number) { this.data[1] = value; }
 
     // Extend me with useful methods like dot, normalise, add, etc...
 
     public addInPlace(other: Vec2): this {
         this.x += other.x;
-        this.y += other.y;
+        this.z += other.z;
         return this;
     }
 
     public add(other: Vec2): Vec2 {
         return this.clone().addInPlace(other);
+    }
+
+    public transformInPlace(matrix: Mat4): this {
+        const { x, z } = this;
+        const w = 1;
+
+        this.x =
+            x * matrix.at(0, 0)! +
+            // y = 0; gone.
+            z * matrix.at(0, 2)! +
+            w * matrix.at(0, 3)!;
+
+        this.z =
+            x * matrix.at(2, 0)! +
+            // y = 0; gone.
+            z * matrix.at(2, 2)! +
+            w * matrix.at(2, 3)!;
+
+        return this;
     }
 
     /**

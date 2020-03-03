@@ -16,14 +16,14 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     canvas.addEventListener('mousedown', (mouseEvent) => {
         const rect = canvas.getBoundingClientRect();
         mouseEventData.position.x = mouseEvent.clientX - rect.left;
-        mouseEventData.position.y = mouseEvent.clientY - rect.top;
+        mouseEventData.position.z = mouseEvent.clientY - rect.top;
         eventBus.publish(MouseDown, mouseEventData);
     });
 
     canvas.addEventListener('mousemove', (mouseEvent) => {
         const rect = canvas.getBoundingClientRect();
         mouseEventData.position.x = mouseEvent.clientX - rect.left;
-        mouseEventData.position.y = mouseEvent.clientY - rect.top;
+        mouseEventData.position.z = mouseEvent.clientY - rect.top;
         eventBus.publish(MouseMove, mouseEventData);
     });
 
@@ -39,9 +39,13 @@ function main(): void {
     const eventBus = new EventBus();
     const canvas = createAndInitialiseCanvas(eventBus);
     const context = canvas.getContext('2d')!;
+    //canvas height & width set to full window size until menus added.
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
     const kitchen = new Kitchen(eventBus);
 
     const mainLoop = () => {
+        context.clearRect(0,0, canvas.width, canvas.height);
         kitchen.update(eventBus);
         kitchen.render(context);
         requestAnimationFrame(mainLoop);
