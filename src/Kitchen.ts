@@ -5,12 +5,12 @@ import { Transform } from "engine/Transform";
 import { Vec3 } from "engine/Vec3";
 import { WallUnitWidget } from "widgets/WallUnitWidget";
 import { DecorPanelWidget } from "widgets/DecorPanelWidget";
+import { TowerUnitWidget } from "widgets/TowerUnitWidget";
 
 export class Kitchen {
     private widgets = new Array<Widget>();
     constructor(eventBus: EventBus) {
         // x: w, y: h, z: d
-
         const scaleVector = Vec3.New(0.2, 0.2, 0.2);
 
         // Base Unit Size A
@@ -111,6 +111,20 @@ export class Kitchen {
             Vec3.New(20, 1920, 450)
         );
 
+        let TowerUnitWidget1 = new TowerUnitWidget(
+            eventBus,
+            new Transform(Vec3.New(200, 300, 2800 * 0.2), 0, scaleVector),
+            //x,y,z
+            Vec3.New(500, 1920, 620)
+        );
+
+        let TowerUnitWidget2 = new TowerUnitWidget(
+            eventBus,
+            new Transform(Vec3.New(300, 200, 2800 * 0.2), 0, scaleVector),
+            //x,y,z
+            Vec3.New(600, 1920, 450)
+        );
+
         // Add widgets to this array
         this.addToWidgets(
             baseUnitWidgetA,
@@ -122,7 +136,9 @@ export class Kitchen {
             decorForWallUnitA,
             decorForWallUnitB,
             decorForTowerUnit1,
-            decorForTowerUnit2
+            decorForTowerUnit2,
+            TowerUnitWidget1,
+            TowerUnitWidget2
         );
     }
 

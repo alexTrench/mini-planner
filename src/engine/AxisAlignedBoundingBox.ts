@@ -1,12 +1,12 @@
-import { Vec3 } from 'engine/Vec3';
-import { Vec2 } from 'engine/Vec2';
+import { Vec3 } from "engine/Vec3";
+import { Vec2 } from "engine/Vec2";
 
 export class AxisAlignedBoundingBox {
     public constructor(
         public centrePoint: Vec3,
         public halfWidth: number,
         public halfHeight: number,
-        public halfDepth: number,
+        public halfDepth: number
     ) {}
 
     /**
