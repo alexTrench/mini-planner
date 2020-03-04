@@ -49,7 +49,7 @@ function main(): void {
     const kitchen = new Kitchen(eventBus);
 
     const mainLoop = () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        // context.clearRect(0, 0, canvas.width, canvas.height);
         kitchen.update(eventBus);
         kitchen.render(context);
         requestAnimationFrame(mainLoop);
