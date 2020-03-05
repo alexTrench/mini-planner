@@ -1,18 +1,25 @@
-import { Vec2 } from 'engine/Vec2';
+import { Vec2 } from "engine/Vec2";
+import { WidgetType } from "data/DefaultModelData";
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
 export type UnsubscribeFn = () => void;
 
 // Create symbols for message types and add some overloads to the publish and subscribe methods.
-export const MouseDown = Symbol('MouseDown');
-export const MouseMove = Symbol('MouseMove');
+export const MouseDown = Symbol("MouseDown");
+export const MouseMove = Symbol("MouseMove");
+export const NewPlan = Symbol("NewPlan");
+export const SpawnWidget = Symbol("SpawnWidget");
 
 // Define some data type for the messages.
 export interface MouseEventData {
     position: Vec2;
 }
 
-function createUnsubscribeFn(subscriptions: Map<symbol, Set<Listener<any>>>, event: symbol, fn: Listener<any>): UnsubscribeFn {
+function createUnsubscribeFn(
+    subscriptions: Map<symbol, Set<Listener<any>>>,
+    event: symbol,
+    fn: Listener<any>
+): UnsubscribeFn {
     return () => {
         const listeners = subscriptions.get(event);
 
@@ -27,8 +34,19 @@ export class EventBus {
     private subscriptions = new Map<symbol, Set<Listener<any>>>();
 
     // Method overloads to get type safety on subscribe method.
-    public subscribe(event: typeof MouseDown, fn: Listener<[MouseEventData]>): UnsubscribeFn;
-    public subscribe(event: typeof MouseMove, fn: Listener<[MouseEventData]>): UnsubscribeFn;
+    public subscribe(
+        event: typeof MouseDown,
+        fn: Listener<[MouseEventData]>
+    ): UnsubscribeFn;
+    public subscribe(
+        event: typeof MouseMove,
+        fn: Listener<[MouseEventData]>
+    ): UnsubscribeFn;
+    public subscribe(event: typeof NewPlan, fn: Listener): UnsubscribeFn;
+    public subscribe(
+        event: typeof SpawnWidget,
+        fn: Listener<[WidgetType]>
+    ): UnsubscribeFn;
 
     /**
      * Subscribe to an event to be notified when a specific event is emitted.
@@ -46,8 +64,16 @@ export class EventBus {
     }
 
     // Method overloads to get type safety on publish method.
-    public publish(event: typeof MouseDown, mouseEventData: MouseEventData): void;
-    public publish(event: typeof MouseMove, mouseEventData: MouseEventData): void;
+    public publish(
+        event: typeof MouseDown,
+        mouseEventData: MouseEventData
+    ): void;
+    public publish(
+        event: typeof MouseMove,
+        mouseEventData: MouseEventData
+    ): void;
+    public publish(event: typeof NewPlan): void;
+    public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
 
     /**
      * Publish events and trigger the listener functions.

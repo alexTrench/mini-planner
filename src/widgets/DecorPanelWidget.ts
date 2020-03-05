@@ -1,7 +1,6 @@
 import { Widget } from "./Widget";
-import { Transform } from "engine/Transform";
-import { Vec3 } from "engine/Vec3";
 import { EventBus } from "engine/EventBus";
+import { IModelData } from "data/DefaultModelData";
 
 export class DecorPanelWidget extends Widget {
     protected fillColour: string = "#131314";
@@ -9,8 +8,8 @@ export class DecorPanelWidget extends Widget {
     type: string = "decor panel";
     material: string = "#FFFFFF";
 
-    constructor(eventBus: EventBus, transform: Transform, dimensions: Vec3, id: number) {
-        super(eventBus, transform, dimensions, id);
+    constructor(eventBus: EventBus, model: IModelData, id: number) {
+        super(eventBus, model, id);
         this.id = id;
     }
 
@@ -19,8 +18,11 @@ export class DecorPanelWidget extends Widget {
     }
 
     public render(context: CanvasRenderingContext2D) {
-
-        this.renderTwoDimensionPolygon(context, this.fillColour, this.borderColour);
+        this.renderTwoDimensionPolygon(
+            context,
+            this.fillColour,
+            this.borderColour
+        );
     }
 
 }

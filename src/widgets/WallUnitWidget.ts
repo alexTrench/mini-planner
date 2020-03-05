@@ -1,7 +1,6 @@
 import { Widget } from "./Widget";
-import { Transform } from "engine/Transform";
 import { EventBus } from "engine/EventBus";
-import { Vec3 } from "engine/Vec3";
+import { IModelData } from "data/DefaultModelData";
 
 export class WallUnitWidget extends Widget {
     // private t = 0;
@@ -10,13 +9,8 @@ export class WallUnitWidget extends Widget {
     type: string = "wall unit";
     material: string = "#FFFFFF";
 
-    constructor(
-        eventBus: EventBus,
-        transform: Transform,
-        dimensions: Vec3,
-        id: number
-    ) {
-        super(eventBus, transform, dimensions, id);
+    constructor(eventBus: EventBus, model: IModelData, id: number) {
+        super(eventBus, model, id);
         this.id = id;
     }
 

@@ -1,11 +1,10 @@
-import { Transform } from "engine/Transform";
-import { Vec3 } from "engine/Vec3";
 import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
+import { IModelData } from "data/DefaultModelData";
 
 export class BaseUnitWidget extends Widget {
-    constructor(eventBus: EventBus, transform: Transform, dimensions: Vec3, id:number) {
-        super(eventBus, transform, dimensions, id);
+    constructor(eventBus: EventBus, model: IModelData, id: number) {
+        super(eventBus, model, id);
         this.id = id;
     }
     type: string = "base unit";
@@ -16,8 +15,10 @@ export class BaseUnitWidget extends Widget {
     public update() {}
 
     public render(context: CanvasRenderingContext2D): void {
-
-        this.renderTwoDimensionPolygon(context, this.fillColour, this.borderColour);
-
+        this.renderTwoDimensionPolygon(
+            context,
+            this.fillColour,
+            this.borderColour
+        );
     }
 }

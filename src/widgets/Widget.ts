@@ -9,8 +9,12 @@ import {
 import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
 import { IDefaultWidgetInfo } from "engine/IWidgetObject";
+import { IModelData } from "data/DefaultModelData";
 
 export abstract class Widget {
+    public transform: Transform;
+    public dimensions: Vec3;
+
     protected isSelected = false;
     protected isHovered = false;
     protected abstract fillColour: string;
@@ -23,12 +27,23 @@ export abstract class Widget {
 
     public constructor(
         eventBus: EventBus,
-        public transform: Transform,
-        public dimensions: Vec3,
+        model: IModelData,
         protected id: number
     ) {
         eventBus.subscribe(MouseDown, this.handleMouseClick.bind(this));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
+
+        const defaultScaleVector = Vec3.New(0.2, 0.2, 0.2);
+        const defaultTranslation = Vec3.New(400, 400, 400);
+        const defaultRotation = 0;
+        const defaultTransform = new Transform(
+            defaultTranslation,
+            defaultRotation,
+            defaultScaleVector
+        );
+
+        this.transform = defaultTransform.clone();
+        this.dimensions = model.dimensions.clone();
 
         this.boundingBox = new AxisAlignedBoundingBox(
             this.dimensions.x / 2,
@@ -148,26 +163,23 @@ export abstract class Widget {
     public abstract render(context: CanvasRenderingContext2D): void;
 
     public toJSON(): IDefaultWidgetInfo {
-        const {x: tx, y: ty,z: tz} = this.transform.translation;
-        const {x: dx, y: dy, z: dz} = this.dimensions;
+        const { x: tx, y: ty, z: tz } = this.transform.translation;
+        const { x: dx, y: dy, z: dz } = this.dimensions;
 
         const widgetInfo: IDefaultWidgetInfo = {
             id: this.id,
-            position: {x: tx, y: ty, z: tz},
-            dimensions: {w: dx, h: dy, d: dz},
+            position: { x: tx, y: ty, z: tz },
+            dimensions: { w: dx, h: dy, d: dz },
             rotation: this.transform.rotation,
             type: this.type,
-            material: this.material,
+            material: this.material
         };
 
-        console.log(widgetInfo);
-        return widgetInfo
+        return widgetInfo;
+    }
 
-    };
-
-    public hasCollided(box: AxisAlignedBoundingBox) {
-        let isCollided = box.intersectsBoundingBox(this.boundingBox);
-        console.log(isCollided);
+    public hasCollided(box: AxisAlignedBoundingBox): boolean {
+        return box.intersectsBoundingBox(this.boundingBox);
     }
 
     public getBox(): AxisAlignedBoundingBox {

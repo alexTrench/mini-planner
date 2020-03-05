@@ -17,4 +17,12 @@ export class Transform {
 
         return translation.mulInPlace(rotation.mulInPlace(scale));
     }
+
+    public clone(): Transform {
+        return new Transform(
+            this.translation.clone(),
+            this.rotation,
+            this.scale.clone()
+        );
+    }
 }

@@ -1,7 +1,6 @@
-import {Widget} from "../widgets/Widget";
+import { Widget } from "../widgets/Widget";
 
-
-export class ItemIdGenerator{
+export class ItemIdGenerator {
     private maxIdInUse = 0;
     private idsToReuse = new Set();
 
@@ -22,7 +21,6 @@ export class ItemIdGenerator{
     };
 
     private getReusedId = () => {
-
         const idRetrieved: number = this.idsToReuse.values().next().value;
 
         this.idsToReuse.delete(idRetrieved);
@@ -31,11 +29,11 @@ export class ItemIdGenerator{
     };
 
     public getUniqueWidgetId() {
-
-        const newId = this.idsToReuse.size > 0 ? this.getReusedId() : this.incrementMaxIdInUse();
-        console.log("id is: " + newId);
+        const newId =
+            this.idsToReuse.size > 0
+                ? this.getReusedId()
+                : this.incrementMaxIdInUse();
 
         return newId;
-
-    };
+    }
 }

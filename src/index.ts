@@ -6,6 +6,19 @@ import {
     MouseMove
 } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Root } from "ui/Root";
+
+/**
+ * Creates the div element for the React components
+ */
+function createReactDivElement(): HTMLDivElement {
+    const ui = document.createElement("div");
+    ui.id = "ui";
+    document.body.appendChild(ui);
+    return ui;
+}
 
 /**
  * Creates the canvas element and initialises the event listeners for user input.
@@ -41,18 +54,18 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
  * Entry point
  */
 function main(): void {
+    const ui = createReactDivElement();
+
     document.body.style.margin = "0";
     const eventBus = new EventBus();
     const canvas = createAndInitialiseCanvas(eventBus);
     const context = canvas.getContext("2d")!;
     const kitchen = new Kitchen(eventBus);
 
-    //temporary debugging
-    //@ts-ignore
-    window.kitchen = kitchen;
+    ReactDOM.render(React.createElement(Root, { eventBus }), ui);
 
     const mainLoop = () => {
-        context.clearRect(0,0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
         kitchen.update(eventBus);
         kitchen.render(context);
         requestAnimationFrame(mainLoop);
