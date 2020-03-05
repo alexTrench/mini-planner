@@ -46,6 +46,11 @@ function main(): void {
     const canvas = createAndInitialiseCanvas(eventBus);
     const context = canvas.getContext("2d")!;
     const kitchen = new Kitchen(eventBus);
+
+    //temporary debugging
+    //@ts-ignore
+    window.kitchen = kitchen;
+
     const mainLoop = () => {
         context.clearRect(0,0, canvas.width, canvas.height);
         kitchen.update(eventBus);

@@ -8,6 +8,7 @@ import { WallUnitWidget } from "widgets/WallUnitWidget";
 import { DecorPanelWidget } from "widgets/DecorPanelWidget";
 import { TowerUnitWidget } from "widgets/TowerUnitWidget";
 import { ItemIdGenerator } from "engine/ItemIdGenerator";
+import {IDefaultWidgetInfo, IKitchenInfo} from "engine/IWidgetObject";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
@@ -23,7 +24,7 @@ export class Kitchen {
         const baseUnitSizeA = Vec3.New(600, 720, 620);
         const baseUnitWidgetA = new BaseUnitWidget(
             eventBus,
-            new Transform(Vec3.New(100, 0, 700 * 0.2), 0, scaleVector),
+            new Transform(Vec3.New(100, 0, 700), 0, scaleVector),
             baseUnitSizeA,
             this.itemIdGenerator.getUniqueWidgetId()
         );
@@ -32,7 +33,7 @@ export class Kitchen {
         const baseUnitSizeB = Vec3.New(600, 720, 450);
         const baseUnitWidgetB = new BaseUnitWidget(
             eventBus,
-            new Transform(Vec3.New(300, 0, 700 * 0.2), 0, scaleVector),
+            new Transform(Vec3.New(300, 0, 700), 0, scaleVector),
             baseUnitSizeB,
             this.itemIdGenerator.getUniqueWidgetId()
         );
@@ -41,7 +42,7 @@ export class Kitchen {
         const wallUnitSizeA = Vec3.New(600, 720, 400);
         const wallUnitWidgetA = new WallUnitWidget(
             eventBus,
-            new Transform(Vec3.New(400 * 0.2, 0, 50), 0, scaleVector),
+            new Transform(Vec3.New(200, 0, 50), 0, scaleVector),
             wallUnitSizeA,
             this.itemIdGenerator.getUniqueWidgetId());
 
@@ -49,14 +50,14 @@ export class Kitchen {
         const wallUnitSizeB = Vec3.New(600, 720, 330);
         const wallUnitWidgetB = new WallUnitWidget(
             eventBus,
-            new Transform(Vec3.New(1100 * 0.2, 0, 50), 0, scaleVector),
+            new Transform(Vec3.New(400, 0, 50), 0, scaleVector),
             wallUnitSizeB,
             this.itemIdGenerator.getUniqueWidgetId());
 
         const decorForBaseUnitA = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(30, 0, 2100 * 0.2),
+                Vec3.New(30, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -68,7 +69,7 @@ export class Kitchen {
         const decorForBaseUnitB = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(50, 0, 2100 * 0.2),
+                Vec3.New(50, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -80,7 +81,7 @@ export class Kitchen {
         const decorForWallUnitA = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(70, 0, 2100 * 0.2),
+                Vec3.New(70, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -92,7 +93,7 @@ export class Kitchen {
         const decorForWallUnitB = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(90, 0, 2100 * 0.2),
+                Vec3.New(90, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -104,7 +105,7 @@ export class Kitchen {
         const decorForTowerUnit1 = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(110, 0, 2100 * 0.2),
+                Vec3.New(110, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -116,7 +117,7 @@ export class Kitchen {
         const decorForTowerUnit2 = new DecorPanelWidget(
             eventBus,
             new Transform(
-                Vec3.New(130, 0, 2100 * 0.2),
+                Vec3.New(130, 0, 400),
                 0,
                 Vec3.New(0.2, 0.2, 0.2)
             ),
@@ -125,17 +126,17 @@ export class Kitchen {
             this.itemIdGenerator.getUniqueWidgetId()
         );
 
-        let TowerUnitWidget1 = new TowerUnitWidget(
+        let towerUnitWidget1 = new TowerUnitWidget(
             eventBus,
-            new Transform(Vec3.New(200, 300, 2800 * 0.2), 0, scaleVector),
+            new Transform(Vec3.New(200, 300, 850), 0, scaleVector),
             //x,y,z
             Vec3.New(500, 1920, 620),
             this.itemIdGenerator.getUniqueWidgetId()
         );
 
-        let TowerUnitWidget2 = new TowerUnitWidget(
+        let towerUnitWidget2 = new TowerUnitWidget(
             eventBus,
-            new Transform(Vec3.New(300, 200, 2800 * 0.2), 0, scaleVector),
+            new Transform(Vec3.New(350, 200, 850), 0, scaleVector),
             //x,y,z
             Vec3.New(600, 1920, 450),
             this.itemIdGenerator.getUniqueWidgetId()
@@ -145,24 +146,24 @@ export class Kitchen {
         const worktopSize: Vec3 = Vec3.New(3000, 40, 600);
 
         // Worktop Widget African Teak Border
-        const africanTeakColour = "#E8A818";
         const worktopWidgetAfrican = new WorktopWidget(
             eventBus,
-            new Transform(Vec3.New(400, 0, 1000), 0, scaleVector),
+            new Transform(Vec3.New(200, 0, 1000), 0, scaleVector),
             worktopSize,
-            africanTeakColour,
+            'African Teak',
             this.itemIdGenerator.getUniqueWidgetId()
         );
 
-        // Worktop Widget Veneer Border
-        const veneerColour = "#44B84A";
-        const worktopWidgetVeneer = new WorktopWidget(
+        // Worktop Widget Vemeer Border
+        const worktopWidgetCementNoir = new WorktopWidget(
             eventBus,
-            new Transform(Vec3.New(1400, 0, 1000), 0, scaleVector),
+            new Transform(Vec3.New(1000, 0, 1000), 0, scaleVector),
             worktopSize,
-            veneerColour,
+            'Cement Noir',
             this.itemIdGenerator.getUniqueWidgetId()
         );
+
+        worktopWidgetCementNoir.toJSON();
 
         // Add widgets to this array
         this.addToWidgets(
@@ -176,10 +177,10 @@ export class Kitchen {
             decorForWallUnitB,
             decorForTowerUnit1,
             decorForTowerUnit2,
-            TowerUnitWidget1,
-            TowerUnitWidget2,
+            towerUnitWidget1,
+            towerUnitWidget2,
             worktopWidgetAfrican,
-            worktopWidgetVeneer
+            worktopWidgetCementNoir
         );
     }
 
@@ -187,11 +188,11 @@ export class Kitchen {
     public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
             widget.update(eventBus);
-            for (const widgetB of this.widgets) {
-                if (widget !== widgetB) {
-                    widget.hasCollided(widgetB.getBox());
-                }
-            }
+            // for (const widgetB of this.widgets) {
+            //     if (widget !== widgetB) {
+            //         widget.hasCollided(widgetB.getBox());
+            //     }
+            // }
         }
     }
 
@@ -202,5 +203,31 @@ export class Kitchen {
     }
     public addToWidgets(...newWidgets: Widget[]): void {
         this.widgets.push(...newWidgets);
+    }
+
+    public getWidgetById(id: number): Widget | undefined {
+        return this.widgets.find((widget) => widget.getId() === id);
+    }
+
+    public toJSON(): IKitchenInfo {
+        const items: IDefaultWidgetInfo[] = [];
+
+        let w = -Infinity;
+        let d = -Infinity;
+        let h = -Infinity;
+
+        for (const widget of this.widgets) {
+            w = Math.max(w, widget.transform.translation.x + widget.dimensions.x);
+            h =  Math.max(h, widget.transform.translation.y + widget.dimensions.y);
+            d =  Math.max(d, widget.transform.translation.z + widget.dimensions.z);
+
+            items.push(widget.toJSON())
+        }
+
+        return {
+            assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl",
+            roomDimensions: {w,d,h},
+            items,
+        };
     }
 }

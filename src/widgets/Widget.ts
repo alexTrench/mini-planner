@@ -6,14 +6,17 @@ import {
     MouseEventData,
     MouseMove
 } from "engine/EventBus";
-import { Vec2 } from "../engine/Vec2";
+import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
+import { IDefaultWidgetInfo } from "engine/IWidgetObject";
 
 export abstract class Widget {
     protected isSelected = false;
     protected isHovered = false;
     protected abstract fillColour: string;
     protected abstract borderColour: string;
+    protected abstract type: string;
+    protected abstract material: string;
 
     // Maybe add other colours for things?
     boundingBox: AxisAlignedBoundingBox;
@@ -45,6 +48,10 @@ export abstract class Widget {
                 )
             )
         );
+    }
+
+    public getId(): number {
+        return this.id;
     }
 
     public handleMouseClick(_mouse: MouseEventData): void {}
@@ -139,7 +146,24 @@ export abstract class Widget {
 
     public abstract update(eventBus: EventBus): void;
     public abstract render(context: CanvasRenderingContext2D): void;
-    public abstract toJSON(): string;
+
+    public toJSON(): IDefaultWidgetInfo {
+        const {x: tx, y: ty,z: tz} = this.transform.translation;
+        const {x: dx, y: dy, z: dz} = this.dimensions;
+
+        const widgetInfo: IDefaultWidgetInfo = {
+            id: this.id,
+            position: {x: tx, y: ty, z: tz},
+            dimensions: {w: dx, h: dy, d: dz},
+            rotation: this.transform.rotation,
+            type: this.type,
+            material: this.material,
+        };
+
+        console.log(widgetInfo);
+        return widgetInfo
+
+    };
 
     public hasCollided(box: AxisAlignedBoundingBox) {
         let isCollided = box.intersectsBoundingBox(this.boundingBox);

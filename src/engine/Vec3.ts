@@ -72,18 +72,9 @@ export class Vec3 {
         this.z -= other.z;
         return this;
     }
+
     public sub(other: Vec3): Vec3 {
         return this.clone().subInPlace(other);
-    }
-    public absInPlace(): this {
-        this.x = Math.abs(this.x);
-        this.y = Math.abs(this.y);
-        this.z = Math.abs(this.z);
-        return this;
-    }
-
-    public abs(): Vec3 {
-        return this.clone().absInPlace();
     }
 
     public addInPlace(other: Vec3): this {
@@ -95,6 +86,83 @@ export class Vec3 {
 
     public add(other: Vec3): Vec3 {
         return this.clone().addInPlace(other);
+    }
+
+    public mul(other: Vec3): Vec3 {
+        return this.clone().mulInPlace(other);
+    }
+
+    public mulInPlace(other: Vec3): this {
+        this.x *= other.x;
+        this.y *= other.y;
+        this.z *= other.z;
+        return this;
+    }
+
+    public div(other: Vec3): Vec3 {
+        return this.clone().divInPlace(other);
+    }
+
+    public divInPlace(other: Vec3): this {
+        this.x /= other.x;
+        this.y /= other.y;
+        this.z /= other.z;
+        return this;
+    }
+
+    public subScalarInPlace(other: number): this {
+        this.x -= other;
+        this.y -= other;
+        this.z -= other;
+        return this;
+    }
+
+    public subScalar(other: number): Vec3 {
+        return this.clone().subScalarInPlace(other);
+    }
+
+    public addScalarInPlace(other: number): this {
+        this.x += other;
+        this.y += other;
+        this.z += other;
+        return this;
+    }
+
+    public addScalar(other: number): Vec3 {
+        return this.clone().addScalarInPlace(other);
+    }
+
+    public mulScalar(other: number): Vec3 {
+        return this.clone().mulScalarInPlace(other);
+    }
+
+    public mulScalarInPlace(other: number): this {
+        this.x *= other;
+        this.y *= other;
+        this.z *= other;
+        return this;
+    }
+
+    public divScalar(other: number): Vec3 {
+        return this.clone().divScalarInPlace(other);
+    }
+
+    public divScalarInPlace(other: number): this {
+        this.x /= other;
+        this.y /= other;
+        this.z /= other;
+        return this;
+    }
+
+    public absInPlace(): this {
+        this.x = Math.abs(this.x);
+        this.y = Math.abs(this.y);
+        this.z = Math.abs(this.z);
+        return this;
+    }
+
+    public abs(): Vec3 {
+        return this.clone().absInPlace();
     }
 
     public transformInPlace(matrix: Mat4): this {

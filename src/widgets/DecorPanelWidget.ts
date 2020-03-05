@@ -6,6 +6,8 @@ import { EventBus } from "engine/EventBus";
 export class DecorPanelWidget extends Widget {
     protected fillColour: string = "#131314";
     protected borderColour: string = "#131314";
+    type: string = "decor panel";
+    material: string = "#FFFFFF";
 
     constructor(eventBus: EventBus, transform: Transform, dimensions: Vec3, id: number) {
         super(eventBus, transform, dimensions, id);
@@ -21,7 +23,4 @@ export class DecorPanelWidget extends Widget {
         this.renderTwoDimensionPolygon(context, this.fillColour, this.borderColour);
     }
 
-    public toJSON() {
-        return "";
-    }
 }

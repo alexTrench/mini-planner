@@ -7,6 +7,8 @@ export class WallUnitWidget extends Widget {
     // private t = 0;
     protected fillColour = "#E5EBF7";
     protected borderColour = "#72757B";
+    type: string = "wall unit";
+    material: string = "#FFFFFF";
 
     constructor(
         eventBus: EventBus,
@@ -31,7 +33,4 @@ export class WallUnitWidget extends Widget {
         );
     }
 
-    public toJSON(): string {
-        return "toJSON method from WallUnitWidget called";
-    }
 }

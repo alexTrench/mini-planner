@@ -4,13 +4,16 @@ import { EventBus } from "engine/EventBus";
 import { Transform } from "engine/Transform";
 
 export class TowerUnitWidget extends Widget {
-    protected fillColour: string;
-    protected borderColour: string;
+    protected fillColour: string = "#FCE5F1"
+    protected borderColour: string = "#72757B";
+    type: string = "tower unit";
+    material: string = "#FFFFFF";
 
     constructor(
         eventBus: EventBus,
         public transform: Transform,
         public dimensions: Vec3,
+
         id: number
     ) {
         super(eventBus, transform, dimensions, id);
@@ -18,10 +21,11 @@ export class TowerUnitWidget extends Widget {
 
         this.borderColour = "#72757B";
         this.fillColour = "#FCE5F1";
+
     }
 
-    public update(/*eventBus: EventBus*/): void {
-        console.log(/*eventBus*/);
+    public update(_eventBus: EventBus): void {
+
     }
 
     public render(context: CanvasRenderingContext2D): void {
@@ -30,8 +34,5 @@ export class TowerUnitWidget extends Widget {
             this.fillColour,
             this.borderColour
         );
-    }
-    public toJSON(): string {
-        return "";
     }
 }

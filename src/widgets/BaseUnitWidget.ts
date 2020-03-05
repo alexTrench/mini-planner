@@ -8,8 +8,10 @@ export class BaseUnitWidget extends Widget {
         super(eventBus, transform, dimensions, id);
         this.id = id;
     }
+    type: string = "base unit";
     borderColour: string = "#72757B";
     fillColour: string = "#FFFEE7";
+    material: string = "#FFFFFF";
 
     public update() {}
 
@@ -17,9 +19,5 @@ export class BaseUnitWidget extends Widget {
 
         this.renderTwoDimensionPolygon(context, this.fillColour, this.borderColour);
 
-    }
-
-    public toJSON(): string {
-        return "";
     }
 }
