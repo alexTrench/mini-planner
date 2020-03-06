@@ -2,7 +2,9 @@ import { Mat4 } from "engine/Mat4";
 
 export class Vec3 {
     private data!: Float32Array;
-    private constructor() {}
+
+    private constructor() {
+    }
 
     public static New(x: number, y: number, z: number): Vec3 {
         const vec3 = new Vec3();
@@ -49,61 +51,66 @@ export class Vec3 {
     public get x(): number {
         return this.data[0];
     }
+
     public get y(): number {
         return this.data[1];
     }
+
     public get z(): number {
         return this.data[2];
     }
+
     public set x(value: number) {
         this.data[0] = value;
     }
+
     public set y(value: number) {
         this.data[1] = value;
     }
+
     public set z(value: number) {
         this.data[2] = value;
     }
 
     // Extend me with useful methods like dot, normalise, add, etc...
-    public subInPlace(other: Vec3): this {
+    public subInPlace(other: IReadonlyVec3): this {
         this.x -= other.x;
         this.y -= other.y;
         this.z -= other.z;
         return this;
     }
 
-    public sub(other: Vec3): Vec3 {
+    public sub(other: IReadonlyVec3): Vec3 {
         return this.clone().subInPlace(other);
     }
 
-    public addInPlace(other: Vec3): this {
+    public addInPlace(other: IReadonlyVec3): this {
         this.x += other.x;
         this.y += other.y;
         this.z += other.z;
         return this;
     }
 
-    public add(other: Vec3): Vec3 {
+    public add(other: IReadonlyVec3): Vec3 {
         return this.clone().addInPlace(other);
     }
 
-    public mul(other: Vec3): Vec3 {
+    public mul(other: IReadonlyVec3): Vec3 {
         return this.clone().mulInPlace(other);
     }
 
-    public mulInPlace(other: Vec3): this {
+    public mulInPlace(other: IReadonlyVec3): this {
         this.x *= other.x;
         this.y *= other.y;
         this.z *= other.z;
         return this;
     }
 
-    public div(other: Vec3): Vec3 {
+    public div(other: IReadonlyVec3): Vec3 {
         return this.clone().divInPlace(other);
     }
 
-    public divInPlace(other: Vec3): this {
+    public divInPlace(other: IReadonlyVec3): this {
         this.x /= other.x;
         this.y /= other.y;
         this.z /= other.z;
@@ -166,7 +173,7 @@ export class Vec3 {
     }
 
     public transformInPlace(matrix: Mat4): this {
-        const { x, y, z } = this;
+        const {x, y, z} = this;
         const w = 1;
 
         this.x =
@@ -200,4 +207,32 @@ export class Vec3 {
         vec3.data = new Float32Array(this.data);
         return vec3;
     }
+}
+
+export interface IReadonlyVec3 {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+
+    sub(other: Vec3): Vec3;
+
+    add(other: Vec3): Vec3
+
+    mul(other: Vec3): Vec3;
+
+    div(other: Vec3): Vec3;
+
+    subScalar(other: number): Vec3;
+
+    addScalar(other: number): Vec3;
+
+    mulScalar(other: number): Vec3;
+
+    divScalar(other: number): Vec3;
+
+    abs(): Vec3;
+
+    transform(matrix: Mat4): Vec3;
+
+    clone(): Vec3;
 }

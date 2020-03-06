@@ -1,6 +1,6 @@
 import * as React from "react";
-import { EventBus, NewPlan, SpawnWidget } from "engine/EventBus";
-import { WidgetType } from "data/DefaultModelData";
+import { EventBus, NewPlan, SpawnWidget, SpawnFromLocalStore } from "engine/EventBus";
+import { WidgetType } from "data/ModelData";
 
 interface IMenuProps {
     eventBus: EventBus;
@@ -15,6 +15,11 @@ export class Menu extends React.Component<IMenuProps> {
     private newPlan(event: React.MouseEvent) {
         event.preventDefault();
         this.props.eventBus.publish(NewPlan);
+    }
+
+    private spawnFromLocalStore(event: React.MouseEvent): void{
+        event.preventDefault();
+        this.props.eventBus.publish(SpawnFromLocalStore)
     }
 
     render() {
@@ -120,6 +125,9 @@ export class Menu extends React.Component<IMenuProps> {
                 </button>
                 <button id="newPlan" onClick={event => this.newPlan(event)}>
                     New Plan
+                </button>
+                <button id="loadCache" onClick={event => this.spawnFromLocalStore(event)}>
+                    Load From Cache
                 </button>
             </div>
         );

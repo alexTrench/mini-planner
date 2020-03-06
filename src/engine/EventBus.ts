@@ -1,5 +1,5 @@
 import { Vec2 } from "engine/Vec2";
-import { WidgetType } from "data/DefaultModelData";
+import { WidgetType } from "data/ModelData";
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
 export type UnsubscribeFn = () => void;
@@ -10,6 +10,7 @@ export const MouseUp = Symbol('MouseUp');
 export const MouseMove = Symbol("MouseMove");
 export const NewPlan = Symbol("NewPlan");
 export const SpawnWidget = Symbol("SpawnWidget");
+export const SpawnFromLocalStore = Symbol("SpawnFromLocalStore");
 
 // Define some data type for the messages.
 export interface MouseEventData {
@@ -49,9 +50,9 @@ export class EventBus {
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
     ): UnsubscribeFn;
-    
-    
-    
+
+
+    public  subscribe(event: typeof SpawnFromLocalStore, fn: Listener<any>) :UnsubscribeFn;
 
     /**
      * Subscribe to an event to be notified when a specific event is emitted.
@@ -80,8 +81,7 @@ export class EventBus {
     ): void;
     public publish(event: typeof NewPlan): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
-    
-
+    public publish(event: typeof SpawnFromLocalStore): void;
 
     /**
      * Publish events and trigger the listener functions.
