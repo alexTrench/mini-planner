@@ -6,6 +6,7 @@ export type UnsubscribeFn = () => void;
 
 // Create symbols for message types and add some overloads to the publish and subscribe methods.
 export const MouseDown = Symbol("MouseDown");
+export const MouseUp = Symbol('MouseUp');
 export const MouseMove = Symbol("MouseMove");
 export const NewPlan = Symbol("NewPlan");
 export const SpawnWidget = Symbol("SpawnWidget");
@@ -38,6 +39,7 @@ export class EventBus {
         event: typeof MouseDown,
         fn: Listener<[MouseEventData]>
     ): UnsubscribeFn;
+    public subscribe(event: typeof MouseUp, fn: Listener<[MouseEventData]>): UnsubscribeFn;
     public subscribe(
         event: typeof MouseMove,
         fn: Listener<[MouseEventData]>
@@ -47,6 +49,9 @@ export class EventBus {
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
     ): UnsubscribeFn;
+    
+    
+    
 
     /**
      * Subscribe to an event to be notified when a specific event is emitted.
@@ -68,12 +73,15 @@ export class EventBus {
         event: typeof MouseDown,
         mouseEventData: MouseEventData
     ): void;
+    public publish(event: typeof MouseUp, mouseEventData: MouseEventData): void;
     public publish(
         event: typeof MouseMove,
         mouseEventData: MouseEventData
     ): void;
     public publish(event: typeof NewPlan): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
+    
+
 
     /**
      * Publish events and trigger the listener functions.

@@ -19,9 +19,7 @@ export class AxisAlignedBoundingBox {
             .sub(box.transform.translation)
             .abs();
 
-        const scaleX = this.transform.scale.x;
-        const scaleY = this.transform.scale.y;
-        const scaleZ = this.transform.scale.z;
+        const {x: scaleX, y: scaleY, z: scaleZ} = this.transform.scale;
 
         const collidesOnX =
             centreDifference.x <=
@@ -40,10 +38,20 @@ export class AxisAlignedBoundingBox {
      * Checks to see if this bounding box contains a 2D point in the XZ plane.
      * @param point The 2D point to check.
      */
-    public containsPointInXZ(_point: Vec2): boolean {
-        // TODO:
-        // Implement me.
-        return false;
+    public containsPointInXZ(point: Vec2): boolean {
+        const xZPlane = Vec2.New(
+            this.transform.translation.x,
+            this.transform.translation.z
+        );
+
+        const {x: scaleX, z: scaleZ} = this.transform.scale;
+
+        const centreDifference = xZPlane.sub(point).abs();
+
+        const pointWithinX = centreDifference.x <= this.halfWidth * scaleX;
+        const pointWithinZ = centreDifference.z <= this.halfDepth * scaleZ;
+
+        return pointWithinX && pointWithinZ;
     }
 
     /**

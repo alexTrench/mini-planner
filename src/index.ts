@@ -3,6 +3,7 @@ import {
     MouseEventData,
     EventBus,
     MouseDown,
+    MouseUp,
     MouseMove
 } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
@@ -33,18 +34,23 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
         position: Vec2.New(0, 0)
     };
 
-    canvas.addEventListener("mousedown", mouseEvent => {
+    const mouseEventHelper = (eventType: any, mouseEventData: MouseEventData, mouseEvent: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
         mouseEventData.position.x = mouseEvent.clientX - rect.left;
         mouseEventData.position.z = mouseEvent.clientY - rect.top;
-        eventBus.publish(MouseDown, mouseEventData);
+        eventBus.publish(eventType, mouseEventData);
+    }
+
+    canvas.addEventListener("mousedown", mouseEvent => {
+        mouseEventHelper(MouseDown, mouseEventData, mouseEvent)
+    });
+
+    canvas.addEventListener("mouseup", mouseEvent => {
+        mouseEventHelper(MouseUp, mouseEventData, mouseEvent)
     });
 
     canvas.addEventListener("mousemove", mouseEvent => {
-        const rect = canvas.getBoundingClientRect();
-        mouseEventData.position.x = mouseEvent.clientX - rect.left;
-        mouseEventData.position.z = mouseEvent.clientY - rect.top;
-        eventBus.publish(MouseMove, mouseEventData);
+        mouseEventHelper(MouseMove, mouseEventData, mouseEvent)
     });
 
     return canvas;
