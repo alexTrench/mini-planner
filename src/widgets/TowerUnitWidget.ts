@@ -16,5 +16,7 @@ export class TowerUnitWidget extends Widget {
         this.fillColour = "#FCE5F1";
     }
 
-    public update(_eventBus: EventBus): void {}
+    public update(_eventBus: EventBus): void {
+
+    }
 }

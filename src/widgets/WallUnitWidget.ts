@@ -1,4 +1,4 @@
-import { Widget } from "./Widget";
+import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
 import { History } from "engine/History"
 import { IModelData } from "data/ModelData";

@@ -1,4 +1,4 @@
-import { Widget } from "../widgets/Widget";
+import { Widget } from "widgets/Widget";
 
 export class ItemIdGenerator {
     private maxIdInUse = 0;
@@ -9,7 +9,6 @@ export class ItemIdGenerator {
      */
     public releaseId = (id: number): void => {
         this.idsToReuse.add(id);
-        console.log('ids available for reuse: ' + this.idsToReuse)
     };
 
     public setMaxId = (widgets: Widget[]) => {

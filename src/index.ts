@@ -1,4 +1,4 @@
-import { Kitchen } from "./Kitchen";
+import { Kitchen } from "Kitchen";
 import {
     IMouseEventData,
     EventBus,
@@ -26,7 +26,7 @@ function createReactDivElement(): HTMLDivElement {
 
 /**
  * Creates the canvas element and initialises the event listeners for user input.
- */   
+ */
 function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     const heightOfMenuBar = 130;
     const canvas = document.createElement("canvas");
@@ -86,7 +86,6 @@ function main(): void {
     const canvas = createAndInitialiseCanvas(eventBus);
     const context = canvas.getContext("2d")!;
     const kitchen = new Kitchen(eventBus, history);
-
     ReactDOM.render(React.createElement(Root, { eventBus }), ui);
 
     //temporary debugging

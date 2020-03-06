@@ -108,6 +108,10 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         }
     }
 
+    public getMaterial() {
+        return this.material;
+    }
+
     public toJSON(): IWorktopWidgetInfo {
         const { dimensions, material } = this.model;
 
@@ -329,6 +333,17 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         ) {
            super.handleMouseDown(mouse)
 
+            if (this.boundingBox.containsPointInXZ(mouse.position)) {
+                const centrePoint = Vec2.New(
+                    this.model.transform.translation.x,
+                    this.model.transform.translation.z
+                );
+                this.mouseDragOffset = centrePoint.sub(mouse.position);
+                this.isDragging = true;
+                this.isSelected = true;
+            } else {
+                this.isSelected = false;
+            }
         }
     }
 

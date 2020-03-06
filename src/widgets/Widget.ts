@@ -78,6 +78,7 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         return this.id;
     }
 
+
     public handleMouseDown(mouse: IMouseEventData): void {
         const { translation } = this.model.transform;
         if (this.boundingBox.containsPointInXZ(mouse.position)) {
@@ -130,6 +131,11 @@ export abstract class Widget<Model extends IModelData = IModelData> {
             );
         }
     }
+
+    public getType(){
+        return this.type;
+    }
+
 
     public setDimensions(width: number, height: number, depth: number): void {
         const { dimensions } = this.model;
@@ -198,6 +204,7 @@ export abstract class Widget<Model extends IModelData = IModelData> {
             rotation: transform.rotation,
             type,
             material,
+            WidgetType: this.model.widgetType
         };
         return widgetInfo;
     }

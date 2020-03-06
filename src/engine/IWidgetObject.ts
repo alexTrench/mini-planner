@@ -1,5 +1,5 @@
 import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
-import {WidgetModule} from "data/ModelData";
+import {WidgetModule, WidgetType} from "data/ModelData";
 
 export interface IPositionDataXZ {
     x: number;
@@ -27,6 +27,7 @@ export interface IDefaultWidgetInfo {
     rotation: number;
     type: string;
     material: string;
+    WidgetType: WidgetType;
 }
 
 export interface IWorktopWidgetInfo extends IDefaultWidgetInfo {
@@ -41,3 +42,5 @@ export interface IKitchenInfo {
     roomDimensions: IDimensionsData;
     items: IDefaultWidgetInfo[];
 }
+
+

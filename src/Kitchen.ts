@@ -1,3 +1,4 @@
+import { Basket } from "engine/Basket";
 import { ItemIdGenerator } from "engine/ItemIdGenerator";
 import { IDefaultWidgetInfo, IKitchenInfo } from "engine/IWidgetObject";
 import { History, ActionType } from "engine/History";
@@ -14,26 +15,28 @@ import {
     IModelData,
     WidgetType
 } from "data/ModelData";
-import {Transform} from "./engine/Transform";
-import {Vec3} from "./engine/Vec3";
-import {WorktopMaterial} from "./data/WorktopMaterialBorderDisplayColour";
+import {Transform} from "engine/Transform";
+import {Vec3} from "engine/Vec3";
+import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
     private planName?: string;
+    private basket = new Basket(this.widgets);
 
     constructor(eventBus: EventBus, history: History) {
 
 
-        eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SavePlan, this.savePlan.bind(this));
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
+        eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
         this.itemIdGenerator.setMaxId(this.widgets);
         eventBus.subscribe(SpawnFromLocalStore, () => this.spawnFromLocalStorage(eventBus, history));
         eventBus.subscribe(SpawnWidget, type => this.spawnFromMenu(eventBus, type, history));
         eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
+        eventBus.subscribe(MouseUp, () => this.updateBasket());
 
         if (this.hasPlanInLocalStorage()) {
                     this.spawnFromLocalStorage(eventBus, history);
@@ -51,8 +54,8 @@ export class Kitchen {
             }
         }
     }
-    public addToWidgets(...newWidgets: Widget[]): void {
-            this.widgets.push(...newWidgets);
+    public addToWidgets(newWidget: Widget): void {
+            this.widgets.push(newWidget);
     }
 
     public render(context: CanvasRenderingContext2D): void {
@@ -137,17 +140,22 @@ export class Kitchen {
         this.itemIdGenerator.setMaxId(this.widgets);
     };
 
+    protected updateBasket() {
+        this.basket.updateBasketFromKitchen(this.widgets);
+    }
+
     private spawnFromLocalStorage(eventBus: EventBus, history: History): void {
         const storedWidgets = JSON.parse(localStorage.getItem("widgets")!) as IDefaultWidgetInfo[];
         for(const widget of storedWidgets) {
-            const {
+            const  {
                 rotation,
                 position,
                 dimensions: storedDimensions,
                 type,
                 id,
                 module,
-                material
+                material,
+                WidgetType
             } = widget;
 
             const { x, y, z } = position;
@@ -164,10 +172,10 @@ export class Kitchen {
                 case "wall unit":
                 case "tower unit":
                 case "decor panel":
-                    model = createModel(module, dimensions, transform, material);
+                    model = createModel(module, dimensions, transform, material, WidgetType);
                     break;
                 case "worktop":
-                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial);
+                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial, WidgetType);
                     break;
                 default:
                     throw new Error(`Unknown widget type ${type}`);
@@ -183,7 +191,6 @@ export class Kitchen {
         assert(model, `No default model for widget type ${type}`);
         const newId = this.itemIdGenerator.getUniqueWidgetId();
         this.spawnWidget(eventBus, cloneModel(model), newId, history);
-        this.clearLocalStorage();
         this.addToLocalStorage();
     }
 
@@ -201,6 +208,8 @@ export class Kitchen {
         const Widget = this.getWidgetConstructor(model.module);
         const widget = new Widget(eventBus,history, model, id);
         history.saveSpawnAction(ActionType.Spawn, widget.getId(), widget);
+        this.basket = new Basket(this.widgets);
+
         this.addToWidgets(widget);
     }
 
@@ -257,6 +266,7 @@ export class Kitchen {
 
             this.widgets = tempWidgets;
         }
+        this.addToLocalStorage();
     }
 
 }

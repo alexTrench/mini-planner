@@ -1,7 +1,8 @@
 import * as React from "react";
-import {Button, AppBar, Toolbar} from "@material-ui/core";
 import 'style/Menu.css';
 import {EventBus, NewPlan, SavePlan, SpawnWidget, DeleteWidget, SpawnFromLocalStore} from "engine/EventBus";
+import { Button, AppBar, Toolbar } from "@material-ui/core";
+import 'style/Menu.css';
 import {WidgetType} from "data/ModelData";
 
 interface IMenuProps {
@@ -31,7 +32,7 @@ export class Menu extends React.Component<IMenuProps> {
     }
 
 
-    private spawnFromLocalStore(event: React.MouseEvent): void {
+    private spawnFromLocalStore(event: React.MouseEvent): void{
         event.preventDefault();
         this.props.eventBus.publish(SpawnFromLocalStore)
     }
@@ -44,134 +45,91 @@ export class Menu extends React.Component<IMenuProps> {
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.BaseUnitA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.BaseUnitA)}>
                             Base Unit A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.BaseUnitB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.BaseUnitB)}>
                             Base Unit B
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.WallUnitA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.WallUnitA)}>
                             Wall Unit A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.WallUnitB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.WallUnitB)}>
                             Wall Unit B
                         </Button>
 
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.TowerUnitA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.TowerUnitA)}>
                             Tower Unit A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.TowerUnitB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.TowerUnitB)}>
                             Tower Unit B
                         </Button>
 
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.WorktopA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.WorktopA)}>
                             Worktop A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.WorktopB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.WorktopB)}>
                             Worktop B
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorBaseA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorBaseA)}>
                             Decor Base Unit A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorBaseB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorBaseB)}>
                             Decor Base Unit B
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorWallA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorWallA)}>
                             Decor Wall A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorWallB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorWallB)}>
                             Decor Wall B
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorTowerA)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorTowerA)}>
                             Decor Tower A
                         </Button>
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
-                                onClick={event =>
-                                    this.spawnWidget(event, WidgetType.DecorTowerB)
-                                }
-                        >
+                                onClick={event => this.spawnWidget(event, WidgetType.DecorTowerB)}>
                             Decor Tower B
                         </Button>
                     </Toolbar>
                     <Toolbar>
-
                         <Button
                             size="small"
                             variant="outlined"

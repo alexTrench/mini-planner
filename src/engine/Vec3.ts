@@ -72,7 +72,6 @@ export class Vec3 {
         this.data[2] = value;
     }
 
-    // Extend me with useful methods like dot, normalise, etc...
     public dotProduct(other: Vec3): number {
         const x = other.x * this.x;
         const y = other.y * this.y;
@@ -100,7 +99,6 @@ export class Vec3 {
     }
 
     //testing, not sure if this is right
-    //void for now but will return a new vec3 eventually
     public crossProduct(other: Vec3): Vec3 {
         let newX = this.y * other.z - this.z * other.y;
         let newY = this.z * other.x - this.x * other.z;
@@ -108,7 +106,6 @@ export class Vec3 {
         return Vec3.New(newX, newY, newZ);
     }
 
-    // Extend me with useful methods like dot, normalise, add, etc...
     public subInPlace(other: IReadonlyVec3): this {
         this.x -= other.x;
         this.y -= other.y;

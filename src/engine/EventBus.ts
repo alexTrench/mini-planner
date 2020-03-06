@@ -1,5 +1,5 @@
 import { Vec2 } from "engine/Vec2";
-import { IKeyboardEventData } from './Keyboard';
+import { IKeyboardEventData } from 'engine/Keyboard';
 import { WidgetType } from "data/ModelData";
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
