@@ -2,7 +2,7 @@ import { Widget } from "widgets/Widget";
 import { IWorktopWidgetInfo } from "engine/IWidgetObject";
 import { WORKTOP_MATERIAL_BORDER_COLOUR } from "data/WorktopMaterialBorderDisplayColour";
 import { IWorktopModelData } from "data/DefaultModelData";
-import { EventBus, MouseEventData } from "engine/EventBus";
+import { EventBus, IMouseEventData } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
 import { Transform } from "engine/Transform";
@@ -12,6 +12,8 @@ import {
     transformPolygonInPlace
 } from "engine/PolygonHelpers";
 import { render2dPolygon } from "engine/RenderHelpers";
+import { History, ActionType } from "engine/History";
+import { eq } from 'engine/FloatHelpers';
 
 export class WorktopWidget extends Widget {
     public borderColour: string;
@@ -38,9 +40,15 @@ export class WorktopWidget extends Widget {
     private maxSize: number = 5000;
     private minSize: number = 50;
     private scale: number = 5;
+    private previousDimension: Vec2 = Vec2.Zero();
 
-    constructor(eventBus: EventBus, model: IWorktopModelData, id: number) {
-        super(eventBus, model, id);
+    constructor(
+        eventBus: EventBus,
+        history: History,
+        model: IWorktopModelData,
+        id: number
+    ) {
+        super(eventBus, history, model, id);
         this.material = model.material;
         this.id = id;
         this.borderColour = this.material;
@@ -117,7 +125,13 @@ export class WorktopWidget extends Widget {
         return widgetInfo;
     }
 
-    public handleMouseDown(mouse: MouseEventData): void {
+    public handleMouseDown(mouse: IMouseEventData): void {
+        const centrePoint = Vec2.New(
+            this.transform.translation.x,
+            this.transform.translation.z
+        );
+        this.mouseDragStart = centrePoint;
+        this.previousDimension = Vec2.New(this.dimensions.x, this.dimensions.z);
         //left side box
         this.checkLeft(mouse);
         //right side box
@@ -130,8 +144,7 @@ export class WorktopWidget extends Widget {
         this.movement(mouse);
     }
 
-    public handleMouseUp(mouse: MouseEventData): void {
-        super.handleMouseUp(mouse);
+    public handleMouseUp(mouse: IMouseEventData, history: History): void {
         //left side box
         this.checkLeft(mouse);
         //right side box
@@ -140,9 +153,34 @@ export class WorktopWidget extends Widget {
         this.checkTop(mouse);
         //bottom of the box
         this.checkBottom(mouse);
+
+        const { x: dx, z: dz } = this.dimensions;
+        const { x: px, z: pz } = this.previousDimension;
+
+        if(!eq(dx, px) || !eq(dz, pz)) {
+            const { x: tx, z: tz } = this.transform.translation;
+            const { x: mx, z: mz } = this.mouseDragStart;
+
+            history.saveResizeAction(
+                ActionType.Resize,
+                this.getId(),
+                {
+                        start: Vec2.New(mx, mz),
+                        end: Vec2.New(tx, tz)
+                },
+                {
+                    start: Vec2.New(px, pz),
+                    end: Vec2.New(dx, dz)
+                }
+            );
+
+            this.skipSuperMove = true;
+        }
+
+        super.handleMouseUp(mouse, history);
     }
 
-    public handleMouseMove(mouse: MouseEventData): void {
+    public handleMouseMove(mouse: IMouseEventData): void {
         this.newPoint = mouse.position.x;
         this.newPointY = mouse.position.z;
         //combines all the potential drag events into one tidy function
@@ -156,7 +194,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private checkLeft(mouse: MouseEventData): void {
+    private checkLeft(mouse: IMouseEventData): void {
         if (this.leftBoundingBox.containsPointInXZ(mouse.position)) {
             this.leftBoxSelected = !this.leftBoxSelected;
             this.isSelected = true;
@@ -165,7 +203,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private checkRight(mouse: MouseEventData) {
+    private checkRight(mouse: IMouseEventData) {
         if (this.rightBoundingBox.containsPointInXZ(mouse.position)) {
             this.isSelected = true;
             this.rightBoxSelected = !this.rightBoxSelected;
@@ -174,7 +212,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private checkTop(mouse: MouseEventData) {
+    private checkTop(mouse: IMouseEventData) {
         if (this.topBoundingBox.containsPointInXZ(mouse.position)) {
             this.isSelected = true;
             this.topBoxSelected = !this.topBoxSelected;
@@ -183,7 +221,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private checkBottom(mouse: MouseEventData) {
+    private checkBottom(mouse: IMouseEventData) {
         if (this.bottomBoundingBox.containsPointInXZ(mouse.position)) {
             this.isSelected = true;
             this.bottomBoxSelected = !this.bottomBoxSelected;
@@ -192,7 +230,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private drag(mouse: MouseEventData) {
+    private drag(mouse: IMouseEventData) {
         const { x: transformX, z: transformZ } = this.transform.translation;
         const { x: dimensionsX, z: dimensionsZ } = this.dimensions;
         const { x: scaleX, z: scaleZ } = this.transform.scale;
@@ -225,7 +263,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private dragLeft(newPoint: number, mouse: MouseEventData) {
+    private dragLeft(newPoint: number, mouse: IMouseEventData) {
         const { y: ty, z: tz } = this.transform.translation;
         const { y: dy, z: dz } = this.dimensions;
         const { x: sx } = this.transform.scale;
@@ -240,7 +278,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private dragRight(newPoint: number, mouse: MouseEventData) {
+    private dragRight(newPoint: number, mouse: IMouseEventData) {
         const { y: ty, z: tz } = this.transform.translation;
         const { y: dy, z: dz } = this.dimensions;
         const { x: sx } = this.transform.scale;
@@ -253,7 +291,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private dragUp(newPoint: number, mouse: MouseEventData) {
+    private dragUp(newPoint: number, mouse: IMouseEventData) {
         const { x: tx, y: ty } = this.transform.translation;
         const { x: dx, y: dy } = this.dimensions;
         const { z: sz } = this.transform.scale;
@@ -267,7 +305,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private dragDown(newPoint: number, mouse: MouseEventData) {
+    private dragDown(newPoint: number, mouse: IMouseEventData) {
         const { x: tx, y: ty } = this.transform.translation;
         const { x: dx, y: dy } = this.dimensions;
         const { z: sz } = this.transform.scale;
@@ -280,7 +318,7 @@ export class WorktopWidget extends Widget {
         }
     }
 
-    private movement(mouse: MouseEventData) {
+    private movement(mouse: IMouseEventData) {
         //makes sure you cannot move the box while resizing
         if (
             !this.leftBoxSelected &&

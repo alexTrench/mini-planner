@@ -4,7 +4,7 @@ import {
     EventBus,
     MouseDown,
     MouseUp,
-    MouseEventData,
+    IMouseEventData,
     MouseMove
 } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
@@ -16,6 +16,8 @@ import {
     transformPolygonInPlace
 } from "engine/PolygonHelpers";
 import { render2dPolygon } from "engine/RenderHelpers";
+import { History, ActionType } from "engine/History";
+import { eq } from 'engine/FloatHelpers';
 
 export abstract class Widget {
     public transform: Transform;
@@ -28,18 +30,21 @@ export abstract class Widget {
     protected abstract borderColour: string;
     protected abstract type: string;
     protected abstract material: string;
-    protected mouseDragOffset: Vec2 = Vec2.New(0, 0);
+    protected mouseDragOffset: Vec2 = Vec2.Zero();
+    protected mouseDragStart: Vec2 = Vec2.Zero();
+    protected skipSuperMove = false;
 
     // Maybe add other colours for things?
     boundingBox: AxisAlignedBoundingBox;
 
     public constructor(
         eventBus: EventBus,
+        history: History,
         model: IModelData,
         protected id: number
     ) {
         eventBus.subscribe(MouseDown, this.handleMouseDown.bind(this));
-        eventBus.subscribe(MouseUp, this.handleMouseUp.bind(this));
+        eventBus.subscribe(MouseUp, e => this.handleMouseUp(e, history));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
 
         const defaultScaleVector = Vec3.New(0.2, 0.2, 0.2);
@@ -78,29 +83,45 @@ export abstract class Widget {
         return this.id;
     }
 
-    public handleMouseDown(mouse: MouseEventData): void {
+    public handleMouseDown(mouse: IMouseEventData): void {
         if (this.boundingBox.containsPointInXZ(mouse.position)) {
             const centrePoint = Vec2.New(
                 this.transform.translation.x,
                 this.transform.translation.z
             );
             this.mouseDragOffset = centrePoint.sub(mouse.position);
+            this.mouseDragStart = centrePoint;
             this.isDragging = true;
         }
     }
 
-    public handleMouseUp(_mouse: MouseEventData): void {
+    public handleMouseUp(mouse: IMouseEventData, history: History): void {
+        if (this.boundingBox.containsPointInXZ(mouse.position)) {
+            const { x: tx, z: tz } = this.transform.translation;
+            const { x: mx, z: mz } = this.mouseDragStart;
+
+            if (this.skipSuperMove) {
+                this.skipSuperMove = false;
+            } else {
+                if (!eq(tx, mx) || !eq(tz, mz)) {
+                    history.saveMoveAction(
+                        ActionType.Move,
+                        this.getId(),
+                        {
+                            start: Vec2.New(mx, mz),
+                            end: Vec2.New(tx, tz)
+                        }
+                    );
+                }
+            }
+        }
+        
         this.isDragging = false;
     }
 
-    public handleMouseMove(mouse: MouseEventData): void {
+    public handleMouseMove(mouse: IMouseEventData): void {
         if (this.isDragging) {
             this.setPosition(
-                mouse.position.x + this.mouseDragOffset.x,
-                this.transform.translation.y,
-                mouse.position.z + this.mouseDragOffset.z
-            );
-            this.boundingBox.setPosition(
                 mouse.position.x + this.mouseDragOffset.x,
                 this.transform.translation.y,
                 mouse.position.z + this.mouseDragOffset.z
@@ -130,6 +151,7 @@ export abstract class Widget {
         this.transform.scale.x = x;
         this.transform.scale.y = y;
         this.transform.scale.z = z;
+        this.boundingBox.setScale(x, y, z);
     }
 
     public abstract update(eventBus: EventBus): void;
@@ -141,6 +163,12 @@ export abstract class Widget {
         transformPolygonInPlace(polygon, transformMatrix);
         const { fillColour, borderColour } = this;
         render2dPolygon(context, polygon, fillColour, borderColour);
+
+        const polygon2 = createRectanglePolygon(x / 2, z / 2);
+        const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
+        transformPolygonInPlace(polygon2, transformMatrix2);
+        // const { fillColour, borderColour } = this;
+        render2dPolygon(context, polygon2, "red", "red");
     }
 
     public toJSON(): IDefaultWidgetInfo {

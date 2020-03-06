@@ -30,7 +30,7 @@ export interface IWorktopWidgetInfo extends IDefaultWidgetInfo {
 }
 
 export interface IKitchenInfo {
-    assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl";
+    assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl/";
     roomDimensions: IDimensionsData;
     items: IDefaultWidgetInfo[];
 }

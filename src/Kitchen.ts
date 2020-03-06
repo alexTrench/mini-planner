@@ -1,18 +1,27 @@
 import { Widget } from "widgets/Widget";
-import { EventBus, NewPlan, SpawnWidget } from "engine/EventBus";
+import {
+    EventBus,
+    NewPlan,
+    SpawnWidget,
+    KeyPress,
+} from "engine/EventBus";
 import { ItemIdGenerator } from "engine/ItemIdGenerator";
 import { IDefaultWidgetInfo, IKitchenInfo } from "engine/IWidgetObject";
 import { assert } from "utility/Assert";
 import { DEFAULT_WIDGET_MODEL_DATA, WidgetType } from "data/DefaultModelData";
+import { History, ActionType } from "engine/History";
+import { IKeyboardEventData } from 'engine/Keyboard';
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
-    constructor(eventBus: EventBus) {
+
+    constructor(eventBus: EventBus, history: History) {
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SpawnWidget, type =>
-            this.spawnWidget(eventBus, type)
+            this.spawnWidget(eventBus, history, type)
         );
+        eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
         this.itemIdGenerator.setMaxId(this.widgets);
     }
 
@@ -30,6 +39,22 @@ export class Kitchen {
     public render(context: CanvasRenderingContext2D): void {
         for (const widget of this.widgets) {
             widget.render(context);
+        }
+    }
+
+    public handleKeyPress(keyPress: IKeyboardEventData, history: History): void {
+        const { key, ctrl, shift, cmd } = keyPress;
+
+        const undoKeySequence = ((ctrl || cmd) && key === "z");
+        if (undoKeySequence) {
+            history.undo(this.widgets);
+        }
+
+        const redoWindowsKeySequence = (ctrl && key === "y");
+        const redoMacOSXKeySequence = (shift && cmd && key === "Z");
+        const redoKeySequence = redoWindowsKeySequence || redoMacOSXKeySequence;
+        if (redoKeySequence) {
+            history.redo(this.widgets);
         }
     }
 
@@ -66,7 +91,7 @@ export class Kitchen {
         }
 
         return {
-            assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl",
+            assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl/",
             roomDimensions: { w, d, h },
             items
         };
@@ -76,7 +101,11 @@ export class Kitchen {
         this.widgets = [];
     }
 
-    private spawnWidget(eventBus: EventBus, type: WidgetType): void {
+    private spawnWidget(
+        eventBus: EventBus,
+        history: History,
+        type: WidgetType
+    ): void {
         const model = DEFAULT_WIDGET_MODEL_DATA.get(type);
         assert(model, `No default model for widget type ${type}`);
 
@@ -89,10 +118,11 @@ export class Kitchen {
 
         const widgetToAdd = new WidgetConstructor(
             eventBus,
+            history,
             model,
             this.itemIdGenerator.getUniqueWidgetId()
         );
-
+        history.saveSpawnAction(ActionType.Spawn, widgetToAdd.id, widgetToAdd);
         this.addToWidgets(widgetToAdd);
     }
 }
