@@ -17,7 +17,7 @@ export class AxisAlignedBoundingBox {
     public intersectsBoundingBox(box: AxisAlignedBoundingBox): boolean {
         const centreDifference = this.transform.translation
             .sub(box.transform.translation)
-            .abs();
+            .absInPlace();
 
         const { x: scaleX, y: scaleY, z: scaleZ } = this.transform.scale;
 

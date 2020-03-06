@@ -1,8 +1,9 @@
 import * as React from "react";
-import {WidgetType} from "data/DefaultModelData";
 import {Button, AppBar, Toolbar} from "@material-ui/core";
 import 'style/Menu.css';
-import {EventBus, NewPlan, SavePlan, SpawnWidget, DeleteWidget} from "engine/EventBus";
+import {EventBus, NewPlan, SavePlan, SpawnWidget, DeleteWidget, SpawnFromLocalStore} from "engine/EventBus";
+import {WidgetType} from "data/ModelData";
+
 interface IMenuProps {
     eventBus: EventBus;
 }
@@ -18,6 +19,7 @@ export class Menu extends React.Component<IMenuProps> {
         event.preventDefault();
         this.props.eventBus.publish(NewPlan);
     }
+
     private deleteWidget(event: React.MouseEvent) {
         event.preventDefault();
         this.props.eventBus.publish(DeleteWidget);
@@ -28,6 +30,11 @@ export class Menu extends React.Component<IMenuProps> {
         this.props.eventBus.publish(SavePlan);
     }
 
+
+    private spawnFromLocalStore(event: React.MouseEvent): void {
+        event.preventDefault();
+        this.props.eventBus.publish(SpawnFromLocalStore)
+    }
 
     render() {
         return (
@@ -52,7 +59,6 @@ export class Menu extends React.Component<IMenuProps> {
                         >
                             Base Unit B
                         </Button>
-
                         <Button size="small"
                                 variant="outlined"
                                 color="inherit"
@@ -185,9 +191,15 @@ export class Menu extends React.Component<IMenuProps> {
                             color="inherit" id="deleteWidget" onClick={event => this.deleteWidget(event)}>
                             Delete
                         </Button>
+                        <Button id="loadCache"
+                                size="small"
+                                variant="outlined"
+                                color="inherit"
+                                onClick={event => this.spawnFromLocalStore(event)}>
+                            Load From Cache
+                        </Button>
                     </Toolbar>
                 </AppBar>
-
             </div>
         );
     }

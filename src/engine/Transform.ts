@@ -2,6 +2,14 @@ import { Vec3 } from "engine/Vec3";
 import { Mat4 } from "engine/Mat4";
 
 export class Transform {
+    public static New(translation: Vec3,
+                      rotation: number,
+                      scale: Vec3): Transform {
+        return new Transform(translation, rotation, scale);
+    }
+
+    // TODO:
+    // Make this private to keep consistency with the vector and matrix classes.
     public constructor(
         public translation: Vec3,
         public rotation: number,

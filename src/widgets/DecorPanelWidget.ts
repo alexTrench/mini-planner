@@ -1,7 +1,7 @@
-import { Widget } from "./Widget";
+import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
-import { IModelData } from "data/DefaultModelData";
 import { History } from "engine/History"
+import { IModelData } from "data/ModelData";
 
 export class DecorPanelWidget extends Widget {
     protected fillColour: string = "#131314";
@@ -11,7 +11,6 @@ export class DecorPanelWidget extends Widget {
 
     constructor(eventBus: EventBus, history: History, model: IModelData, id: number) {
         super(eventBus, history, model, id);
-        this.id = id;
     }
 
     public update(eventBus: EventBus) {

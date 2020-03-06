@@ -1,11 +1,11 @@
-import { Vec2 } from "./Vec2";
+import { Vec2 } from "engine/Vec2";
 import { Widget } from "widgets/Widget";
 
 export enum ActionType {
-    Spawn = "spawn",
-    Move = "move",
-    Resize = "resize",
-    Rotate = "ok"
+    Spawn,
+    Move,
+    Resize,
+    Rotate
 }
 
 interface Vec2StateChange {
@@ -72,7 +72,7 @@ export class History {
     undo(widgets: Widget[]): void {
         if (this.undoStack.length > 0) {
             const action = this.undoStack.pop()!;
-            
+
             const matchesActionId = (widget: Widget) =>
                 widget.getId() === action.id;
 
@@ -81,12 +81,12 @@ export class History {
                     const widgetIndex = widgets.findIndex(matchesActionId);
                     widgets.splice(widgetIndex, 1);
                     break;
-                case ActionType.Move: { 
+                case ActionType.Move: {
                     const widget = widgets.find(matchesActionId);
                     if (widget) {
                         widget.setPosition(
                             action.position.start.x,
-                            widget.transform.translation.y,
+                            widget.model.transform.translation.y,
                             action.position.start.z
                         );
                     }
@@ -98,12 +98,12 @@ export class History {
                         // Order of operations matters!
                         widget.setDimensions(
                             action.dimensions.start.x,
-                            widget.dimensions.y,
+                            widget.model.dimensions.y,
                             action.dimensions.start.z
                         );
                         widget.setPosition(
                             action.position.start.x,
-                            widget.transform.translation.y,
+                            widget.model.transform.translation.y,
                             action.position.start.z
                         );
                     }
@@ -117,7 +117,7 @@ export class History {
     redo(widgets: Widget[]): void {
         if (this.redoStack.length > 0) {
             const action = this.redoStack.pop()!;
-            
+
             const matchesActionId = (widget: Widget) =>
                 widget.getId() === action.id;
 
@@ -131,7 +131,7 @@ export class History {
                     if (widget) {
                         widget.setPosition(
                             action.position.end.x,
-                            widget.transform.translation.y,
+                            widget.model.transform.translation.y,
                             action.position.end.z
                         );
                     }
@@ -142,12 +142,12 @@ export class History {
                     if (widget) {
                         widget.setDimensions(
                             action.dimensions.end.x,
-                            widget.dimensions.y,
+                            widget.model.dimensions.y,
                             action.dimensions.end.z
                         );
                         widget.setPosition(
                             action.position.end.x,
-                            widget.transform.translation.y,
+                            widget.model.transform.translation.y,
                             action.position.end.z
                         );
                     }

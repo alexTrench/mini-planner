@@ -1,11 +1,22 @@
-import { Widget } from "widgets/Widget";
 import { ItemIdGenerator } from "engine/ItemIdGenerator";
 import { IDefaultWidgetInfo, IKitchenInfo } from "engine/IWidgetObject";
 import { History, ActionType } from "engine/History";
 import { IKeyboardEventData } from 'engine/Keyboard';
-import { EventBus, NewPlan, SavePlan, KeyPress, SpawnWidget, DeleteWidget } from "engine/EventBus";
+import { EventBus, MouseUp,  NewPlan, SavePlan, KeyPress,SpawnFromLocalStore, SpawnWidget, DeleteWidget } from "engine/EventBus";
 import { assert } from "utility/Assert";
-import {DEFAULT_WIDGET_MODEL_DATA, WidgetType} from "data/DefaultModelData";
+import {IWidgetConstructor, Widget} from "widgets/Widget";
+import {
+    cloneModel,
+    createModel,
+    createWorktopModel,
+    DEFAULT_WIDGET_MODEL_DATA,
+    defaultScaleVector,
+    IModelData,
+    WidgetType
+} from "data/ModelData";
+import {Transform} from "./engine/Transform";
+import {Vec3} from "./engine/Vec3";
+import {WorktopMaterial} from "./data/WorktopMaterialBorderDisplayColour";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
@@ -18,11 +29,16 @@ export class Kitchen {
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SavePlan, this.savePlan.bind(this));
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
-        eventBus.subscribe(SpawnWidget, type =>
-            this.spawnWidget(eventBus, history, type)
-        );
         eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
         this.itemIdGenerator.setMaxId(this.widgets);
+        eventBus.subscribe(SpawnFromLocalStore, () => this.spawnFromLocalStorage(eventBus, history));
+        eventBus.subscribe(SpawnWidget, type => this.spawnFromMenu(eventBus, type, history));
+        eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
+
+        if (this.hasPlanInLocalStorage()) {
+                    this.spawnFromLocalStorage(eventBus, history);
+                    this.itemIdGenerator.setMaxId(this.widgets);
+                }
     }
 
     public update(eventBus: EventBus): void {
@@ -34,6 +50,9 @@ export class Kitchen {
                 }
             }
         }
+    }
+    public addToWidgets(...newWidgets: Widget[]): void {
+            this.widgets.push(...newWidgets);
     }
 
     public render(context: CanvasRenderingContext2D): void {
@@ -63,13 +82,16 @@ export class Kitchen {
 
     }
 
-
-    public addToWidgets(...newWidgets: Widget[]): void {
-        this.widgets.push(...newWidgets);
+    public hasPlanInLocalStorage(): boolean {
+        return Boolean(localStorage.getItem("widgets"));
     }
 
-    public getWidgetById(id: number): Widget | undefined {
-        return this.widgets.find(widget => widget.getId() === id);
+    public addToLocalStorage(): void {
+        localStorage.setItem("widgets", JSON.stringify(this.widgets));
+    }
+
+    public clearLocalStorage(): void {
+        localStorage.removeItem("widgets");
     }
 
     public toJSON(): IKitchenInfo {
@@ -80,17 +102,19 @@ export class Kitchen {
         let h = -Infinity;
 
         for (const widget of this.widgets) {
+            const { transform, dimensions } = widget.model;
+
             w = Math.max(
                 w,
-                widget.transform.translation.x + widget.dimensions.x
+                transform.translation.x + dimensions.x
             );
             h = Math.max(
                 h,
-                widget.transform.translation.y + widget.dimensions.y
+                transform.translation.y + dimensions.y
             );
             d = Math.max(
                 d,
-                widget.transform.translation.z + widget.dimensions.z
+                transform.translation.z + dimensions.z
             );
 
             items.push(widget.toJSON());
@@ -109,31 +133,75 @@ export class Kitchen {
         this.itemIdGenerator.setMaxId(this.widgets);
         this.planName = prompt("Please name your kitchen ", "Custom Kitchen")!;
 
+        this.clearLocalStorage();
+        this.itemIdGenerator.setMaxId(this.widgets);
     };
 
-    private spawnWidget(
-        eventBus: EventBus,
-        history: History,
-        type: WidgetType
-    ): void {
+    private spawnFromLocalStorage(eventBus: EventBus, history: History): void {
+        const storedWidgets = JSON.parse(localStorage.getItem("widgets")!) as IDefaultWidgetInfo[];
+        for(const widget of storedWidgets) {
+            const {
+                rotation,
+                position,
+                dimensions: storedDimensions,
+                type,
+                id,
+                module,
+                material
+            } = widget;
+
+            const { x, y, z } = position;
+            const translation = Vec3.New(x, y, z);
+            const transform = Transform.New(translation, rotation, defaultScaleVector);
+
+            const { w, d, h } = storedDimensions;
+            const dimensions = Vec3.New(w, h, d);
+
+            let model: IModelData;
+
+            switch (type) {
+                case "base unit":
+                case "wall unit":
+                case "tower unit":
+                case "decor panel":
+                    model = createModel(module, dimensions, transform, material);
+                    break;
+                case "worktop":
+                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial);
+                    break;
+                default:
+                    throw new Error(`Unknown widget type ${type}`);
+            }
+
+            this.spawnWidget(eventBus, model, id, history);
+        }
+    }
+
+
+    private spawnFromMenu(eventBus: EventBus, type: WidgetType, history: History): void {
         const model = DEFAULT_WIDGET_MODEL_DATA.get(type);
         assert(model, `No default model for widget type ${type}`);
+        const newId = this.itemIdGenerator.getUniqueWidgetId();
+        this.spawnWidget(eventBus, cloneModel(model), newId, history);
+        this.clearLocalStorage();
+        this.addToLocalStorage();
+    }
 
-        const WidgetModule = require(`widgets/${model.module}`);
-
+    private getWidgetConstructor(module: string): IWidgetConstructor {
+        const WidgetModule = require(`widgets/${module}`);
         const key = Object.keys(WidgetModule).find(key => key !== "__esModule");
         assert(key, "Key is undefined");
         const WidgetConstructor = WidgetModule[key];
         assert(WidgetConstructor, "WidgetConstructor is undefined");
 
-        const widgetToAdd = new WidgetConstructor(
-            eventBus,
-            history,
-            model,
-            this.itemIdGenerator.getUniqueWidgetId()
-        );
-        history.saveSpawnAction(ActionType.Spawn, widgetToAdd.id, widgetToAdd);
-        this.addToWidgets(widgetToAdd);
+        return WidgetConstructor;
+    }
+
+    private spawnWidget(eventBus: EventBus, model: IModelData, id: number, history: History): void {
+        const Widget = this.getWidgetConstructor(model.module);
+        const widget = new Widget(eventBus,history, model, id);
+        history.saveSpawnAction(ActionType.Spawn, widget.getId(), widget);
+        this.addToWidgets(widget);
     }
 
     public savePlan = async () => {

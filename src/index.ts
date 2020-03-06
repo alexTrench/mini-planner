@@ -89,6 +89,10 @@ function main(): void {
 
     ReactDOM.render(React.createElement(Root, { eventBus }), ui);
 
+    //temporary debugging
+    //@ts-ignore
+    window.kitchen = kitchen;
+
     const mainLoop = () => {
         context.clearRect(0, 0, canvas.width, canvas.height);
         kitchen.update(eventBus);

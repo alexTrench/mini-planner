@@ -1,7 +1,6 @@
 import { Widget } from "widgets/Widget";
 import { IWorktopWidgetInfo } from "engine/IWidgetObject";
 import { WORKTOP_MATERIAL_BORDER_COLOUR } from "data/WorktopMaterialBorderDisplayColour";
-import { IWorktopModelData } from "data/DefaultModelData";
 import { EventBus, IMouseEventData } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
@@ -14,8 +13,9 @@ import {
 import { render2dPolygon } from "engine/RenderHelpers";
 import { History, ActionType } from "engine/History";
 import { eq } from 'engine/FloatHelpers';
+import { IWorktopModelData } from "data/ModelData";
 
-export class WorktopWidget extends Widget {
+export class WorktopWidget extends Widget<IWorktopModelData> {
     public borderColour: string;
     public fillColour: string = "#F0F0F0";
     type: string = "worktop";
@@ -50,16 +50,13 @@ export class WorktopWidget extends Widget {
     ) {
         super(eventBus, history, model, id);
         this.material = model.material;
-        this.id = id;
         this.borderColour = this.material;
-        this.borderColour = WORKTOP_MATERIAL_BORDER_COLOUR.get(
-            this.material
-        )!.borderColour;
+        this.borderColour = WORKTOP_MATERIAL_BORDER_COLOUR.get(model.material)!;
 
         //prettier-ignore
-        const { x: transformX, y: transformY, z: transformZ } = this.transform.translation;
-        const { x: dimensionX, z: dimensionZ } = this.dimensions;
-        const { x: scaleX, z: scaleY } = this.transform.scale;
+        const { x: transformX, y: transformY, z: transformZ } = this.model.transform.translation;
+        const { x: dimensionX, z: dimensionZ } = this.model.dimensions;
+        const { x: scaleX, z: scaleY } = this.model.transform.scale;
 
         this.topBoundingBox = this.createHandleBoundingBox(
             transformX,
@@ -112,26 +109,30 @@ export class WorktopWidget extends Widget {
     }
 
     public toJSON(): IWorktopWidgetInfo {
+        const { dimensions, material } = this.model;
+
         const widgetInfo = super.toJSON() as IWorktopWidgetInfo;
 
-        const { x, z } = this.dimensions.divScalar(2);
+        const { x, z } = dimensions.divScalar(2);
 
+        widgetInfo.material = material;
         widgetInfo.points = [
             { x: -x, z: -z },
             { x, z: -z },
             { x, z },
             { x: -x, z }
         ];
+
         return widgetInfo;
     }
 
     public handleMouseDown(mouse: IMouseEventData): void {
         const centrePoint = Vec2.New(
-            this.transform.translation.x,
-            this.transform.translation.z
+            this.model.transform.translation.x,
+            this.model.transform.translation.z
         );
         this.mouseDragStart = centrePoint;
-        this.previousDimension = Vec2.New(this.dimensions.x, this.dimensions.z);
+        this.previousDimension = Vec2.New(this.model.dimensions.x, this.model.dimensions.z);
         //left side box
         this.checkLeft(mouse);
         //right side box
@@ -154,11 +155,11 @@ export class WorktopWidget extends Widget {
         //bottom of the box
         this.checkBottom(mouse);
 
-        const { x: dx, z: dz } = this.dimensions;
+        const { x: dx, z: dz } = this.model.dimensions;
         const { x: px, z: pz } = this.previousDimension;
 
         if(!eq(dx, px) || !eq(dz, pz)) {
-            const { x: tx, z: tz } = this.transform.translation;
+            const { x: tx, z: tz } = this.model.transform.translation;
             const { x: mx, z: mz } = this.mouseDragStart;
 
             history.saveResizeAction(
@@ -188,7 +189,7 @@ export class WorktopWidget extends Widget {
         if (this.isDragging) {
             this.setPosition(
                 mouse.position.x + this.mouseDragOffset.x,
-                this.transform.translation.y,
+                this.model.transform.translation.y,
                 mouse.position.z + this.mouseDragOffset.z
             );
         }
@@ -231,9 +232,9 @@ export class WorktopWidget extends Widget {
     }
 
     private drag(mouse: IMouseEventData) {
-        const { x: transformX, z: transformZ } = this.transform.translation;
-        const { x: dimensionsX, z: dimensionsZ } = this.dimensions;
-        const { x: scaleX, z: scaleZ } = this.transform.scale;
+        const { x: transformX, z: transformZ } = this.model.transform.translation;
+        const { x: dimensionsX, z: dimensionsZ } = this.model.dimensions;
+        const { x: scaleX, z: scaleZ } = this.model.transform.scale;
         //left of the box
         if (this.leftBoxSelected) {
             this.dragLeft(this.newPoint, mouse);
@@ -264,9 +265,9 @@ export class WorktopWidget extends Widget {
     }
 
     private dragLeft(newPoint: number, mouse: IMouseEventData) {
-        const { y: ty, z: tz } = this.transform.translation;
-        const { y: dy, z: dz } = this.dimensions;
-        const { x: sx } = this.transform.scale;
+        const { y: ty, z: tz } = this.model.transform.translation;
+        const { y: dy, z: dz } = this.model.dimensions;
+        const { x: sx } = this.model.transform.scale;
 
         const dx = Math.floor((this.rightPoint - newPoint) * this.scale);
 
@@ -279,9 +280,9 @@ export class WorktopWidget extends Widget {
     }
 
     private dragRight(newPoint: number, mouse: IMouseEventData) {
-        const { y: ty, z: tz } = this.transform.translation;
-        const { y: dy, z: dz } = this.dimensions;
-        const { x: sx } = this.transform.scale;
+        const { y: ty, z: tz } = this.model.transform.translation;
+        const { y: dy, z: dz } = this.model.dimensions;
+        const { x: sx } = this.model.transform.scale;
 
         const dx = Math.floor((newPoint - this.leftPoint) * this.scale);
         if (dx >= this.minSize && dx <= this.maxSize) {
@@ -292,9 +293,9 @@ export class WorktopWidget extends Widget {
     }
 
     private dragUp(newPoint: number, mouse: IMouseEventData) {
-        const { x: tx, y: ty } = this.transform.translation;
-        const { x: dx, y: dy } = this.dimensions;
-        const { z: sz } = this.transform.scale;
+        const { x: tx, y: ty } = this.model.transform.translation;
+        const { x: dx, y: dy } = this.model.dimensions;
+        const { z: sz } = this.model.transform.scale;
 
         const dz = Math.floor((this.bottomPoint - newPoint) * this.scale);
 
@@ -306,9 +307,9 @@ export class WorktopWidget extends Widget {
     }
 
     private dragDown(newPoint: number, mouse: IMouseEventData) {
-        const { x: tx, y: ty } = this.transform.translation;
-        const { x: dx, y: dy } = this.dimensions;
-        const { z: sz } = this.transform.scale;
+        const { x: tx, y: ty } = this.model.transform.translation;
+        const { x: dx, y: dy } = this.model.dimensions;
+        const { z: sz } = this.model.transform.scale;
 
         const dz = Math.floor((newPoint - this.topPoint) * this.scale);
         if (dz >= this.minSize && dz <= this.maxSize) {
@@ -342,11 +343,11 @@ export class WorktopWidget extends Widget {
             this.resizingWidgetSize,
             new Transform(
                 Vec3.New(translationX, translationY, translationZ),
-                this.transform.rotation,
+                this.model.transform.rotation,
                 Vec3.New(
-                    this.transform.scale.x,
-                    this.transform.scale.y,
-                    this.transform.scale.z
+                    this.model.transform.scale.x,
+                    this.model.transform.scale.y,
+                    this.model.transform.scale.z
                 )
             )
         );
@@ -354,30 +355,30 @@ export class WorktopWidget extends Widget {
     }
 
     public setPosition(x: number, y: number, z: number): void {
-        this.transform.translation.x = x;
-        this.transform.translation.y = y;
-        this.transform.translation.z = z;
+        this.model.transform.translation.x = x;
+        this.model.transform.translation.y = y;
+        this.model.transform.translation.z = z;
 
         this.boundingBox.setPosition(x, y, z);
         this.topBoundingBox.setPosition(
             x,
             y,
-            z - (this.dimensions.z / 2) * this.transform.scale.z
+            z - (this.model.dimensions.z / 2) * this.model.transform.scale.z
         );
         this.rightBoundingBox.setPosition(
-            x + (this.dimensions.x / 2) * this.transform.scale.x,
+            x + (this.model.dimensions.x / 2) * this.model.transform.scale.x,
             y,
             z
         );
         this.leftBoundingBox.setPosition(
-            x - (this.dimensions.x / 2) * this.transform.scale.x,
+            x - (this.model.dimensions.x / 2) * this.model.transform.scale.x,
             y,
             z
         );
         this.bottomBoundingBox.setPosition(
             x,
             y,
-            z + (this.dimensions.z / 2) * this.transform.scale.z
+            z + (this.model.dimensions.z / 2) * this.model.transform.scale.z
         );
     }
 }
