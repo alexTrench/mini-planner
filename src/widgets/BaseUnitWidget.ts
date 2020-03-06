@@ -1,10 +1,11 @@
 import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
 import { IModelData } from "data/DefaultModelData";
+import { History } from "engine/History"
 
 export class BaseUnitWidget extends Widget {
-    constructor(eventBus: EventBus, model: IModelData, id: number) {
-        super(eventBus, model, id);
+    constructor(eventBus: EventBus, history: History, model: IModelData, id: number) {
+        super(eventBus, history, model, id);
         this.id = id;
     }
     type: string = "base unit";
