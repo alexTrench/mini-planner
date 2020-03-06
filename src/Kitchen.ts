@@ -8,7 +8,6 @@ import { DEFAULT_WIDGET_MODEL_DATA, WidgetType } from "data/DefaultModelData";
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
-
     constructor(eventBus: EventBus) {
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SpawnWidget, type =>

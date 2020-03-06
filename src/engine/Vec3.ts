@@ -65,14 +65,48 @@ export class Vec3 {
         this.data[2] = value;
     }
 
-    // Extend me with useful methods like dot, normalise, add, etc...
+    // Extend me with useful methods like dot, normalise, etc...
+    public dotProduct(other: Vec3): number {
+        const x = other.x * this.x;
+        const y = other.y * this.y;
+        const z = other.z * this.z;
+
+        return x + y + z;
+    }
+
+    public getMagnitude(): number {
+        return Math.sqrt(this.dotProduct(this));
+    }
+
+    public normaliseInPlace(): this {
+        const magnitude = this.getMagnitude();
+
+        this.x /= magnitude;
+        this.y /= magnitude;
+        this.z /= magnitude;
+
+        return this;
+    }
+
+    public normalise(): Vec3 {
+        return this.clone().normaliseInPlace();
+    }
+
+    //testing, not sure if this is right
+    //void for now but will return a new vec3 eventually
+    public crossProduct(other: Vec3): Vec3 {
+        let newX = this.y * other.z - this.z * other.y;
+        let newY = this.z * other.x - this.x * other.z;
+        let newZ = this.x * other.y - this.y * other.x;
+        return Vec3.New(newX, newY, newZ);
+    }
+
     public subInPlace(other: Vec3): this {
         this.x -= other.x;
         this.y -= other.y;
         this.z -= other.z;
         return this;
     }
-
     public sub(other: Vec3): Vec3 {
         return this.clone().subInPlace(other);
     }

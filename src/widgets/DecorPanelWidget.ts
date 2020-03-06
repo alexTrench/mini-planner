@@ -16,13 +16,4 @@ export class DecorPanelWidget extends Widget {
     public update(eventBus: EventBus) {
         return eventBus;
     }
-
-    public render(context: CanvasRenderingContext2D) {
-        this.renderTwoDimensionPolygon(
-            context,
-            this.fillColour,
-            this.borderColour
-        );
-    }
-
 }

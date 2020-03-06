@@ -17,12 +17,4 @@ export class TowerUnitWidget extends Widget {
     }
 
     public update(_eventBus: EventBus): void {}
-
-    public render(context: CanvasRenderingContext2D): void {
-        this.renderTwoDimensionPolygon(
-            context,
-            this.fillColour,
-            this.borderColour
-        );
-    }
 }

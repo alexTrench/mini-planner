@@ -18,13 +18,4 @@ export class WallUnitWidget extends Widget {
         // this.transform.rotation = this.t % (Math.PI * 2);
         // this.t += 0.05;
     }
-
-    public render(context: CanvasRenderingContext2D): void {
-        this.renderTwoDimensionPolygon(
-            context,
-            this.fillColour,
-            this.borderColour
-        );
-    }
-
 }
