@@ -1,5 +1,5 @@
 import * as React from "react";
-import {EventBus, NewPlan, SavePlan, SpawnWidget, DeleteWidget, SpawnFromLocalStore} from "engine/EventBus";
+import {EventBus, NewPlan, SavePlan, SpawnWidget, DeleteWidget, SpawnFromLocalStore, Rotate} from "engine/EventBus";
 import {WidgetType} from "data/ModelData";
 import {List, ListItem, ListItemText, Drawer, Typography} from "@material-ui/core";
 
@@ -31,6 +31,12 @@ function spawnFromLocalStore(event: React.MouseEvent, eventBus: EventBus): void 
     event.preventDefault();
     eventBus.publish(SpawnFromLocalStore)
 }
+
+function rotate(event: React.MouseEvent, eventBus: EventBus): void {
+    event.preventDefault();
+    eventBus.publish(Rotate)
+}
+
 
 export const Menu: React.FunctionComponent<IMenuProps> = (props) => {
     const {eventBus} = props;
@@ -180,6 +186,13 @@ export const Menu: React.FunctionComponent<IMenuProps> = (props) => {
                             onClick={event => spawnWidget(event, eventBus, WidgetType.DecorTowerB)}>
                         <ListItemText>
                             Decor Tower B
+                        </ListItemText>
+                    </ListItem>
+                    <ListItem button
+                              style={{backgroundColor: "inherit"}}
+                            onClick={event => rotate(event, eventBus)}>
+                        <ListItemText>
+                            Rotate
                         </ListItemText>
                     </ListItem>
 

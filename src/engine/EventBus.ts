@@ -18,6 +18,7 @@ export const DeleteWidget = Symbol("DeleteWidget");
 export const SpawnFromLocalStore = Symbol("SpawnFromLocalStore");
 export const KeyUp = Symbol("KeyUp");
 export const BasketStateUpdated = Symbol("BasketStateUpdated");
+export const Rotate = Symbol("Rotate");
 
 // Define some data type for the messages.
 export interface IMouseEventData {
@@ -62,6 +63,7 @@ export class EventBus {
     public subscribe(event: typeof NewPlan, fn: Listener): UnsubscribeFn;
     public subscribe(event: typeof SavePlan, fn: Listener): UnsubscribeFn;
     public subscribe(event: typeof DeleteWidget, fn: Listener): UnsubscribeFn;
+    public subscribe(event: typeof Rotate, fn: Listener): UnsubscribeFn;
     public subscribe(
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
@@ -108,6 +110,7 @@ export class EventBus {
     public publish(event: typeof NewPlan): void;
     public publish(event: typeof SavePlan): void;
     public publish(event: typeof DeleteWidget): void;
+    public publish(event: typeof Rotate): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
     public publish(event: typeof SpawnFromLocalStore): void;
     public publish(

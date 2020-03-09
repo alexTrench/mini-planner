@@ -72,10 +72,10 @@ export class Mat4 {
             for (let x = 0; x < W; x += 1) {
                 const index = x + y * W;
 
-                aData[index] = aData[x + 0 * W] * bData[0 + y * W]
-                             + aData[x + 1 * W] * bData[1 + y * W]
-                             + aData[x + 2 * W] * bData[2 + y * W]
-                             + aData[x + 3 * W] * bData[3 + y * W];
+                aData[index] = aData[y * W + 0] * bData[x + 0 * W]
+                             + aData[y * W + 1] * bData[x + 1 * W]
+                             + aData[y * W + 2] * bData[x + 2 * W]
+                             + aData[y * W + 3] * bData[x + 3 * W];
             }
         }
 

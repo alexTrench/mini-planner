@@ -169,10 +169,10 @@ export abstract class Widget<Model extends IModelData = IModelData> {
 
         // temp drawing of bounding box - uncomment below to draw bounding box
 
-        // const polygon2 = createRectanglePolygon(x / 2, z / 2);
-        // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
-        // transformPolygonInPlace(polygon2, transformMatrix2);
-        // render2dPolygon(context, polygon2, "red", "black");
+        const polygon2 = createRectanglePolygon(x / 2, z / 2);
+        const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
+        transformPolygonInPlace(polygon2, transformMatrix2);
+        render2dPolygon(context, polygon2, "red", "black");
     }
 
     public toJSON(): IDefaultWidgetInfo {

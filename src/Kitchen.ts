@@ -14,7 +14,8 @@ import {
     SpawnWidget,
     DeleteWidget,
     IMouseEventData,
-    KeyUp
+    KeyUp,
+    Rotate 
 } from "engine/EventBus";
 import { assert } from "utility/Assert";
 import { IWidgetConstructor, Widget } from "widgets/Widget";
@@ -56,13 +57,21 @@ export class Kitchen {
         );
         eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
         eventBus.subscribe(MouseUp, () => this.updateBasket(eventBus));
+        eventBus.subscribe(Rotate, () => this.rotate())
+        this.itemIdGenerator.setMaxId(this.widgets);
 
         if (this.hasPlanInLocalStorage()) {
             this.spawnFromLocalStorage(eventBus, history);
             this.itemIdGenerator.setMaxId(this.widgets);
         }
     }
-    //prettier-ignore
+    
+
+    public rotate() {
+        var increaseInRotation = - 30 * (Math.PI/180)
+        this.widgets[0].setRotationY(this.widgets[0].model.transform.rotation+increaseInRotation)
+    }
+
     public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
             widget.update(eventBus);

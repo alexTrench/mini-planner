@@ -23,7 +23,8 @@ export class Transform {
         const rotation = Mat4.RotationY(this.rotation);
         const scale = Mat4.Scale(sx, sy, sz);
 
-        return translation.mulInPlace(rotation.mulInPlace(scale));
+        return rotation.mulInPlace(scale).mulInPlace(translation); 
+
     }
 
     public clone(): Transform {
