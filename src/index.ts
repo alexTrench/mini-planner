@@ -26,7 +26,7 @@ function createReactDivElement(): HTMLDivElement {
  */
 function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     const canvas = document.createElement("canvas");
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight - 130;
     canvas.width = window.innerWidth;
     document.body.appendChild(canvas);
 

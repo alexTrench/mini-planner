@@ -1,6 +1,9 @@
 import * as React from "react";
-import { EventBus, NewPlan, SpawnWidget } from "engine/EventBus";
-import { WidgetType } from "data/DefaultModelData";
+import {EventBus, NewPlan, SpawnWidget} from "engine/EventBus";
+import {WidgetType} from "data/DefaultModelData";
+import {Button, AppBar, Toolbar} from "@material-ui/core";
+import 'style/Menu.css';
+
 
 interface IMenuProps {
     eventBus: EventBus;
@@ -20,107 +23,147 @@ export class Menu extends React.Component<IMenuProps> {
     render() {
         return (
             <div>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.BaseUnitA)
-                    }
+                <AppBar id="app-bar" position="sticky">
+                <Toolbar>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.BaseUnitA)
+                        }
                 >
                     Base Unit A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.BaseUnitB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.BaseUnitB)
+                        }
                 >
                     Base Unit B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.WallUnitA)
-                    }
+                </Button>
+
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.WallUnitA)
+                        }
                 >
                     Wall Unit A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.WallUnitB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.WallUnitB)
+                        }
                 >
                     Wall Unit B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.TowerUnitA)
-                    }
+                </Button>
+
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.TowerUnitA)
+                        }
                 >
                     Tower Unit A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.TowerUnitB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.TowerUnitB)
+                        }
                 >
                     Tower Unit B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.WorktopA)
-                    }
+                </Button>
+
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.WorktopA)
+                        }
                 >
                     Worktop A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.WorktopB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.WorktopB)
+                        }
                 >
                     Worktop B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorBaseA)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorBaseA)
+                        }
                 >
                     Decor Base Unit A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorBaseB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorBaseB)
+                        }
                 >
                     Decor Base Unit B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorWallA)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorWallA)
+                        }
                 >
                     Decor Wall A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorWallB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorWallB)
+                        }
                 >
                     Decor Wall B
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorTowerA)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorTowerA)
+                        }
                 >
                     Decor Tower A
-                </button>
-                <button
-                    onClick={event =>
-                        this.spawnWidget(event, WidgetType.DecorTowerB)
-                    }
+                </Button>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={event =>
+                            this.spawnWidget(event, WidgetType.DecorTowerB)
+                        }
                 >
                     Decor Tower B
-                </button>
-                <button id="newPlan" onClick={event => this.newPlan(event)}>
+                </Button>
+                </Toolbar>
+                <Toolbar>
+                <Button size="small"
+                        variant="outlined"
+                        color="inherit"
+                        id="newPlan" onClick={event => this.newPlan(event)}>
                     New Plan
-                </button>
+                </Button>
+                </Toolbar>
+            </AppBar>
             </div>
         );
     }
