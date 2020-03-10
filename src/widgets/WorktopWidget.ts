@@ -40,7 +40,6 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             { x: -x, z }
         ];
 
-        console.log(widgetInfo);
         return widgetInfo;
     }
 }

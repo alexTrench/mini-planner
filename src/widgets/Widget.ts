@@ -67,8 +67,8 @@ export abstract class Widget<Model extends IModelData = IModelData> {
     public handleMouseDown(mouse: MouseEventData): void {
         if (this.boundingBox.containsPointInXZ(mouse.position)) {
             const centrePoint = Vec2.New(
-                this.transform.translation.x,
-                this.transform.translation.z
+                this.model.transform.translation.x,
+                this.model.transform.translation.z
             );
             this.mouseDragOffset = centrePoint.sub(mouse.position);
             this.isDragging = true;
@@ -76,6 +76,7 @@ export abstract class Widget<Model extends IModelData = IModelData> {
     }
 
     public handleMouseUp(_mouse: MouseEventData): void {
+
         this.isDragging = false;
     }
 
@@ -83,16 +84,16 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         if (this.isDragging) {
             this.setPosition(
                 mouse.position.x + this.mouseDragOffset.x,
-                this.transform.translation.y,
+                this.model.transform.translation.y,
                 mouse.position.z + this.mouseDragOffset.z
             );
             this.boundingBox.setPosition(
                 mouse.position.x + this.mouseDragOffset.x,
-                this.transform.translation.y,
+                this.model.transform.translation.y,
                 mouse.position.z + this.mouseDragOffset.z
             );
         }
-
+    }
 
     public setDimensions(width: number, height: number, depth: number): void {
         const { dimensions } = this.model;

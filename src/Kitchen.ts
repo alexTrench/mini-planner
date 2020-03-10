@@ -1,14 +1,14 @@
 import {IWidgetConstructor, Widget} from "widgets/Widget";
-import {EventBus, NewPlan, SpawnFromLocalStore, SpawnWidget} from "engine/EventBus";
+import {EventBus, MouseUp, NewPlan, SpawnFromLocalStore, SpawnWidget} from "engine/EventBus";
 import {ItemIdGenerator} from "engine/ItemIdGenerator";
 import {IDefaultWidgetInfo, IKitchenInfo} from "engine/IWidgetObject";
 import {assert} from "utility/Assert";
 import {
     cloneModel,
-    // cloneModel,
     createModel,
     createWorktopModel,
-    DEFAULT_WIDGET_MODEL_DATA, defaultScaleVector,
+    DEFAULT_WIDGET_MODEL_DATA,
+    defaultScaleVector,
     IModelData,
     WidgetType
 } from "data/ModelData";
@@ -24,6 +24,7 @@ export class Kitchen {
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SpawnFromLocalStore, () => this.spawnFromLocalStorage(eventBus));
         eventBus.subscribe(SpawnWidget, type => this.spawnFromMenu(eventBus, type));
+        eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
 
         if (this.hasPlanInLocalStorage()) {
             this.spawnFromLocalStorage(eventBus);
