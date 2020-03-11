@@ -1,6 +1,6 @@
 import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
-import { History } from "engine/History"
+import { History } from "engine/History";
 import { IModelData } from "data/ModelData";
 
 export class DecorPanelWidget extends Widget {
@@ -9,7 +9,12 @@ export class DecorPanelWidget extends Widget {
     type: string = "decor panel";
     material: string = "#FFFFFF";
 
-    constructor(eventBus: EventBus, history: History, model: IModelData, id: number) {
+    constructor(
+        eventBus: EventBus,
+        history: History,
+        model: IModelData,
+        id: number
+    ) {
         super(eventBus, history, model, id);
     }
 

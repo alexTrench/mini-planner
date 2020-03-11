@@ -1,15 +1,23 @@
 import * as React from "react";
-import { Divider, Drawer, List, ListItem, ListItemText, Typography} from "@material-ui/core";
-import {WidgetType} from "data/ModelData";
-import {Basket, IBasketItem} from "engine/Basket";
-import {BasketStateUpdated, EventBus} from "engine/EventBus";
+import {
+    Divider,
+    Drawer,
+    List,
+    ListItem,
+    ListItemText,
+    Typography
+} from "@material-ui/core";
+import { WidgetType } from "data/ModelData";
+import { Basket, IBasketItem } from "engine/Basket";
+import { BasketStateUpdated, EventBus } from "engine/EventBus";
+import { ColourManager } from "ui/colourSelecter";
 
 interface IBasketProps {
     eventBus: EventBus;
     basket: Basket;
 }
 
-function convertWidgetTypeForDisplay(widgetType: WidgetType): string {
+export function convertWidgetTypeForDisplay(widgetType: WidgetType): string {
     // Strip the last character because it's an 'A' or 'B'.
     const indexOfAorB = widgetType.length - 1;
     const stripped = widgetType.slice(0, indexOfAorB);
@@ -18,6 +26,7 @@ function convertWidgetTypeForDisplay(widgetType: WidgetType): string {
     return stripped.replace(/(.*[a-z])([A-Z].*)/, "$1 $2");
 }
 
+//prettier-ignore
 export const BasketUi: React.FunctionComponent<IBasketProps> = (props) => {
     const [basketItems, setBasketItems] =  React.useState([] as IBasketItem[]);
 
@@ -29,13 +38,10 @@ export const BasketUi: React.FunctionComponent<IBasketProps> = (props) => {
         <div id="basket-drawer">
             <Drawer variant={"permanent"} anchor={"right"}>
                 <List style={{width: 230, paddingTop: 0, backgroundColor: "#F1F1F1"}}>
-                    <Typography style={{color: "white", backgroundColor: '#2bb650', padding: 5}}>Widget Info</Typography>
-                    {['Colour', 'Width', 'Height', 'Material'].map((text) => (
-                        <ListItem style={{backgroundColor: "#F1F1F1"}} id="widget-info-list" button key={text}>
-                            <ListItemText primary={text}/>
-                        </ListItem>
-
-                    ))}
+                    <Typography style={{color: "white", backgroundColor: '#2bb650', padding: 5}}>Widget Configuration</Typography>
+                        <ListItem style={{backgroundColor: "#F1F1F1"}} id="widget-info-list">
+                            <ColourManager eventBus={props.eventBus} ></ColourManager> 
+                        </ListItem>     
                 </List>
 
                 <List style={{paddingTop: 0, backgroundColor: "#F1F1F1", height: innerHeight}}>
@@ -50,6 +56,7 @@ export const BasketUi: React.FunctionComponent<IBasketProps> = (props) => {
                     <Divider/>
                     <ListItem><Typography>Total: £{props.basket.calculateTotal()}</Typography></ListItem>
                 </List>
+               
             </Drawer>
         </div>
     );

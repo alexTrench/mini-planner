@@ -26,7 +26,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
     private leftPoint: number = 0;
     private bottomPoint: number = 0;
     private topPoint: number = 0;
-
+    private rotation: number = this.model.transform.rotation;
     private topBoundingBox: AxisAlignedBoundingBox;
     private rightBoundingBox: AxisAlignedBoundingBox;
     private leftBoundingBox: AxisAlignedBoundingBox;
@@ -50,7 +50,6 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
     ) {
         super(eventBus, history, model, id);
         this.material = model.material;
-        this.borderColour = this.material;
         this.borderColour = WORKTOP_MATERIAL_BORDER_COLOUR.get(model.material)!;
 
         //prettier-ignore
@@ -88,12 +87,18 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.allBoundingBoxes.push(this.leftBoundingBox);
         this.allBoundingBoxes.push(this.bottomBoundingBox);
     }
-    public update() {}
+    public update() {
+        if (this.model.transform.rotation > 0) {
+            this.rotation = Math.floor(this.model.transform.rotation * 57.2958);
+        } else {
+            this.rotation = Math.ceil(this.model.transform.rotation * 57.2958);
+        }
+    }
 
     public render(context: CanvasRenderingContext2D): void {
         super.render(context);
 
-        if (this.isSelected) {
+        if (this.isSelected && this.rotation % 180 === 0) {
             for (const box of this.allBoundingBoxes) {
                 const polygon = createRectanglePolygon(
                     box.halfWidth,
@@ -103,7 +108,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
                 transformPolygonInPlace(polygon, transformMatrix);
                 const fillColour = "rgb(0, 255, 0, 0.2)";
                 const borderColour = "green";
-                render2dPolygon(context, polygon, fillColour, borderColour);
+                render2dPolygon(context, polygon, fillColour, borderColour, 1);
             }
         }
     }
@@ -140,28 +145,31 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             this.model.dimensions.x,
             this.model.dimensions.z
         );
-        //left side box
-        this.checkLeft(mouse);
-        //right side box
-        this.checkRight(mouse);
-        //top of the box
-        this.checkTop(mouse);
-        //bottom of the box
-        this.checkBottom(mouse);
+        if (this.rotation % 180 === 0) {
+            //left side box
+            this.checkLeft(mouse);
+            //right side box
+            this.checkRight(mouse);
+            //top of the box
+            this.checkTop(mouse);
+            //bottom of the box
+            this.checkBottom(mouse);
+        }
         //moves the mouse
         this.movement(mouse);
     }
 
     public handleMouseUp(mouse: IMouseEventData, history: History): void {
-        //left side box
-        this.checkLeft(mouse);
-        //right side box
-        this.checkRight(mouse);
-        //top of the box
-        this.checkTop(mouse);
-        //bottom of the box
-        this.checkBottom(mouse);
-
+        if (this.rotation % 180 === 0) {
+            //left side box
+            this.checkLeft(mouse);
+            //right side box
+            this.checkRight(mouse);
+            //top of the box
+            this.checkTop(mouse);
+            //bottom of the box
+            this.checkBottom(mouse);
+        }
         const { x: dx, z: dz } = this.model.dimensions;
         const { x: px, z: pz } = this.previousDimension;
 
@@ -332,18 +340,6 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             !this.rightBoxSelected
         ) {
             super.handleMouseDown(mouse);
-
-            if (this.boundingBox.containsPointInXZ(mouse.position)) {
-                const centrePoint = Vec2.New(
-                    this.model.transform.translation.x,
-                    this.model.transform.translation.z
-                );
-                this.mouseDragOffset = centrePoint.sub(mouse.position);
-                this.isDragging = true;
-                this.isSelected = true;
-            } else {
-                this.isSelected = false;
-            }
         }
     }
 

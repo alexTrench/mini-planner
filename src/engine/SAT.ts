@@ -29,7 +29,6 @@ function getProjection(polygon: Vec2[], axis: Vec2): IProjection {
 
     for (const point of polygon) {
         const projection = point.dotProduct(axis);
-
         min = Math.min(projection, min);
         max = Math.max(projection, max);
     }
@@ -38,17 +37,45 @@ function getProjection(polygon: Vec2[], axis: Vec2): IProjection {
 }
 
 export function SAT(polygon: Vec2[], otherPoly: Vec2[]) {
-    const nestedAxes = [getAxes(polygon), getAxes(otherPoly)];
+    const axes = getAxes(polygon);
+    const axes2 = getAxes(otherPoly);
 
-    for (const axes of nestedAxes) {
-        for (const axis of axes) {
-            const projA = getProjection(polygon, axis);
-            const projB = getProjection(otherPoly, axis);
+    let overlap = +Infinity;
+    let smallestAxis;
+    for (const axis of axes) {
+        const projA = getProjection(polygon, axis);
+        const projB = getProjection(otherPoly, axis);
 
-            if (projA.max < projB.min && projB.max < projA.min) {
-                return false;
+        if (projA.min < projB.max && projA.max < projB.min) {
+            return false;
+        }
+        if (overlap > projA.min - projB.max) {
+            if (projA.min < projB.max) {
+                overlap = Math.min(projA.min - projB.max, overlap);
+            } else {
+                overlap = Math.min(projA.max - projB.min, overlap);
             }
+
+            smallestAxis = axis;
         }
     }
-    return true;
+
+    for (const axis of axes2) {
+        const projA = getProjection(polygon, axis);
+        const projB = getProjection(otherPoly, axis);
+
+        if (projA.min < projB.max && projA.max < projB.min) {
+            return false;
+        }
+        if (overlap > projA.min - projB.max) {
+            if (projA.min < projB.max) {
+                overlap = Math.min(projA.min - projB.max, overlap);
+            } else {
+                overlap = Math.min(projA.max - projB.min, overlap);
+            }
+        }
+        smallestAxis = axis;
+    }
+
+    return { overlap, smallestAxis, true: true };
 }

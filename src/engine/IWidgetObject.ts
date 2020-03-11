@@ -1,5 +1,5 @@
-import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
-import {WidgetModule, WidgetType} from "data/ModelData";
+import { WorktopMaterial } from "data/WorktopMaterialBorderDisplayColour";
+import { WidgetModule, WidgetType } from "data/ModelData";
 
 export interface IPositionDataXZ {
     x: number;
@@ -36,11 +36,8 @@ export interface IWorktopWidgetInfo extends IDefaultWidgetInfo {
 }
 
 export interface IKitchenInfo {
-
     planName: string;
     assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl/";
     roomDimensions: IDimensionsData;
     items: IDefaultWidgetInfo[];
 }
-
-

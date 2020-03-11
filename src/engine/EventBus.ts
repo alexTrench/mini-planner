@@ -1,7 +1,7 @@
 import { Vec2 } from "engine/Vec2";
 import { IKeyboardEventData } from "engine/Keyboard";
 import { WidgetType } from "data/ModelData";
-import {IBasketItem} from "engine/Basket";
+import { IBasketItem } from "engine/Basket";
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
 export type UnsubscribeFn = () => void;
@@ -20,6 +20,9 @@ export const KeyUp = Symbol("KeyUp");
 export const BasketStateUpdated = Symbol("BasketStateUpdated");
 export const Rotate = Symbol("Rotate");
 
+export const ChangeColour = Symbol("ChangeColour");
+export const ChangeWorktopMaterial = Symbol("ChangeWorktopMaterial");
+export const SelectWidget = Symbol("SelectWidget");
 // Define some data type for the messages.
 export interface IMouseEventData {
     position: Vec2;
@@ -65,6 +68,18 @@ export class EventBus {
     public subscribe(event: typeof DeleteWidget, fn: Listener): UnsubscribeFn;
     public subscribe(event: typeof Rotate, fn: Listener): UnsubscribeFn;
     public subscribe(
+        event: typeof SelectWidget,
+        fn: Listener<[WidgetType]>
+    ): UnsubscribeFn;
+    public subscribe(
+        event: typeof ChangeColour,
+        fn: Listener<[string]>
+    ): UnsubscribeFn;
+    public subscribe(
+        event: typeof ChangeWorktopMaterial,
+        fn: Listener<[string]>
+    ): UnsubscribeFn;
+    public subscribe(
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
     ): UnsubscribeFn;
@@ -72,8 +87,14 @@ export class EventBus {
         event: typeof KeyUp,
         fn: Listener<[IKeyboardEventData]>
     ): UnsubscribeFn;
-    public subscribe(event: typeof SpawnFromLocalStore, fn: Listener<any>) :UnsubscribeFn;
-    public subscribe(event: typeof BasketStateUpdated, fn: Listener<[IBasketItem[]]>) :UnsubscribeFn;
+    public subscribe(
+        event: typeof SpawnFromLocalStore,
+        fn: Listener<any>
+    ): UnsubscribeFn;
+    public subscribe(
+        event: typeof BasketStateUpdated,
+        fn: Listener<[IBasketItem[]]>
+    ): UnsubscribeFn;
 
     /**
      * Subscribe to an event to be notified when a specific event is emitted.
@@ -113,13 +134,20 @@ export class EventBus {
     public publish(event: typeof Rotate): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
     public publish(event: typeof SpawnFromLocalStore): void;
+    public publish(event: typeof SelectWidget, widget: WidgetType): void;
     public publish(
         event: typeof KeyUp,
         KeyboardEventData: IKeyboardEventData
     ): void;
-    public publish(event: typeof BasketStateUpdated, items: IBasketItem[]): void;
-
-
+    public publish(
+        event: typeof BasketStateUpdated,
+        items: IBasketItem[]
+    ): void;
+    public publish(event: typeof ChangeColour, newColour: string): void;
+    public publish(
+        event: typeof ChangeWorktopMaterial,
+        newColour: string
+    ): void;
     /**
      * Publish events and trigger the listener functions.
      * @param event The event you to publish.
