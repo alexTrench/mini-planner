@@ -12,6 +12,7 @@ import { render2dPolygon } from "engine/RenderHelpers";
 import { History, ActionType } from "engine/History";
 import { eq } from "engine/FloatHelpers";
 import { IModelData } from "data/ModelData";
+import { WORKTOP_MATERIAL_BORDER_COLOUR } from "data/WorktopMaterialBorderDisplayColour";
 
 export interface IWidgetConstructor {
     new (
@@ -30,8 +31,8 @@ export abstract class Widget<Model extends IModelData = IModelData> {
     protected mouseDragOffset: Vec2 = Vec2.Zero();
     protected mouseDragStart: Vec2 = Vec2.Zero();
     protected skipSuperMove = false;
-    protected abstract readonly fillColour: string;
-    protected abstract readonly borderColour: string;
+    protected abstract fillColour: string;
+    protected abstract borderColour: string;
     protected abstract type: string;
 
     // Maybe add other colours for things?
@@ -45,7 +46,6 @@ export abstract class Widget<Model extends IModelData = IModelData> {
     ) {
         eventBus.subscribe(MouseUp, e => this.handleMouseUp(e, history));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
-
         const { transform, dimensions } = model;
 
         this.boundingBox = new AxisAlignedBoundingBox(
@@ -160,11 +160,12 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         const transformMatrix = this.model.transform.getTransformationMatrix();
         transformPolygonInPlace(polygon, transformMatrix);
         const { fillColour, borderColour } = this;
+
         //testing purposes only
         if (this.isSelected) {
-            render2dPolygon(context, polygon, "#b3ffff", "black");
+            render2dPolygon(context, polygon, fillColour, borderColour, 5);
         } else {
-            render2dPolygon(context, polygon, fillColour, borderColour);
+            render2dPolygon(context, polygon, fillColour, borderColour, 1);
         }
 
         // temp drawing of bounding box - uncomment below to draw bounding box
@@ -172,12 +173,13 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         // const polygon2 = createRectanglePolygon(x / 2, z / 2);
         // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
         // transformPolygonInPlace(polygon2, transformMatrix2);
-        // render2dPolygon(context, polygon2, "red", "black");
+        // render2dPolygon(context, polygon2, "red", "red");
+        //this.setBoundingBoxRotation(context);
     }
 
     public toJSON(): IDefaultWidgetInfo {
         const { type, id, model } = this;
-        const { transform, dimensions, material, module } = model;
+        const { transform, dimensions, module } = model;
 
         const { x: tx, y: ty, z: tz } = transform.translation;
         const { x: dx, y: dy, z: dz } = dimensions;
@@ -189,7 +191,7 @@ export abstract class Widget<Model extends IModelData = IModelData> {
             dimensions: { w: dx, h: dy, d: dz },
             rotation: transform.rotation,
             type,
-            material,
+            material: this.model.material,
             widgetType: this.model.widgetType
         };
         return widgetInfo;
@@ -207,5 +209,51 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         const polygon = createRectanglePolygon(x / 2, z / 2);
 
         return polygon;
+        ///for when rotations is back in
+        //testing purposes
+    }
+    public setBoundingBoxRotation(context: CanvasRenderingContext2D) {
+        const { x, z } = this.model.dimensions;
+        const polygon = createRectanglePolygon(x / 2, z / 2);
+        const transformMatrix = this.model.transform.getTransformationMatrix();
+        transformPolygonInPlace(polygon, transformMatrix);
+
+        let minX = Infinity;
+        let minZ = Infinity;
+
+        let maxX = -Infinity;
+        let maxZ = -Infinity;
+
+        for (let point of polygon) {
+            minX = Math.min(point.x, minX);
+            minZ = Math.min(point.z, minZ);
+
+            maxX = Math.max(point.x, maxX);
+            maxZ = Math.max(point.z, maxZ);
+        }
+
+        let newBoundingBox = [];
+        let topLeft = Vec2.New(minX, minZ);
+        let bottoLeft = Vec2.New(minX, maxZ);
+        let bottomRight = Vec2.New(maxX, maxZ);
+        let topRight = Vec2.New(maxX, minZ);
+
+        newBoundingBox.push(topLeft);
+        newBoundingBox.push(bottoLeft);
+        newBoundingBox.push(bottomRight);
+        newBoundingBox.push(topRight);
+
+        render2dPolygon(context, newBoundingBox, "black", "black", 1);
+    }
+
+    public setMaterial(newMaterial: string) {
+        this.model.material = newMaterial;
+        //testing purposes only
+        this.borderColour = newMaterial;
+    }
+
+    public setWorktopMaterial(newMaterial: string) {
+        this.model.material = newMaterial;
+        this.borderColour = WORKTOP_MATERIAL_BORDER_COLOUR.get(newMaterial)!;
     }
 }

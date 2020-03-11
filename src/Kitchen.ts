@@ -7,14 +7,16 @@ import {
     EventBus,
     MouseUp,
     MouseDown,
-    NewPlan,
+    // NewPlan,
     SavePlan,
     KeyPress,
     SpawnFromLocalStore,
     SpawnWidget,
     DeleteWidget,
     IMouseEventData,
-    KeyUp
+    KeyUp,
+    ChangeColour,
+    ChangeWorktopMaterial
 } from "engine/EventBus";
 import { assert } from "utility/Assert";
 import { IWidgetConstructor, Widget } from "widgets/Widget";
@@ -31,6 +33,7 @@ import { Transform } from "engine/Transform";
 import { Vec3 } from "engine/Vec3";
 import { WorktopMaterial } from "data/WorktopMaterialBorderDisplayColour";
 // import { SAT } from "engine/SAT";
+import { WorktopWidget } from "widgets/WorktopWidget";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
@@ -39,14 +42,16 @@ export class Kitchen {
     private shiftPressed: boolean = false;
 
     constructor(eventBus: EventBus, history: History, private basket: Basket) {
-
-
         eventBus.subscribe(SavePlan, this.savePlan.bind(this));
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
-        eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
         eventBus.subscribe(KeyUp, e => this.handleKeyUp(e));
         eventBus.subscribe(MouseDown, this.widgetDragStart.bind(this));
+        eventBus.subscribe(ChangeColour, colour => this.changeColour(colour));
+        eventBus.subscribe(ChangeWorktopMaterial, colour =>
+            this.changeWorktopMaterial(colour)
+        );
+
         this.itemIdGenerator.setMaxId(this.widgets);
         eventBus.subscribe(SpawnFromLocalStore, () =>
             this.spawnFromLocalStorage(eventBus, history)
@@ -137,7 +142,6 @@ export class Kitchen {
         }
     }
 
-
     public hasPlanInLocalStorage(): boolean {
         return Boolean(localStorage.getItem("widgets"));
     }
@@ -190,9 +194,12 @@ export class Kitchen {
 
     private spawnFromLocalStorage(eventBus: EventBus, history: History): void {
         this.widgets = [];
-        const storedWidgets = JSON.parse(localStorage.getItem("widgets")!) as IDefaultWidgetInfo[];
-        for(const widget of storedWidgets) {
-            const  {
+        const storedWidgets = JSON.parse(
+            localStorage.getItem("widgets")!
+        ) as IDefaultWidgetInfo[];
+
+        for (const widget of storedWidgets) {
+            const {
                 rotation,
                 position,
                 dimensions: storedDimensions,
@@ -221,15 +228,25 @@ export class Kitchen {
                 case "wall unit":
                 case "tower unit":
                 case "decor panel":
-                    model = createModel(module, dimensions, transform, material, widgetType);
+                    model = createModel(
+                        module,
+                        dimensions,
+                        transform,
+                        material,
+                        widgetType
+                    );
                     break;
                 case "worktop":
-                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial, widgetType);
+                    model = createWorktopModel(
+                        dimensions,
+                        transform,
+                        material as WorktopMaterial,
+                        widgetType
+                    );
                     break;
                 default:
                     throw new Error(`Unknown widget type ${type}`);
             }
-
             this.spawnWidget(eventBus, model, id, history);
         }
     }
@@ -244,8 +261,6 @@ export class Kitchen {
         const newId = this.itemIdGenerator.getUniqueWidgetId();
         this.spawnWidget(eventBus, cloneModel(model), newId, history);
         this.addToLocalStorage();
-
-        console.log(this.widgets);
     }
 
     private getWidgetConstructor(module: string): IWidgetConstructor {
@@ -272,7 +287,8 @@ export class Kitchen {
         this.widgets.sort(
             (a, b): any =>
                 a.model.transform.translation.y -
-                b.model.transform.translation.y);
+                b.model.transform.translation.y
+        );
         this.updateBasket(eventBus);
     }
 
@@ -295,7 +311,7 @@ export class Kitchen {
         await fetch("http://localhost:9001/save-kitchen", http);
     };
 
-    public deleteWidget() {
+    public deleteWidget(): void {
         const tempWidgets = [...this.widgets];
         tempWidgets.sort((a, b) => {
             if (a.getIsSelected() && !b.getIsSelected()) {
@@ -331,5 +347,25 @@ export class Kitchen {
             this.widgets = tempWidgets;
         }
         this.addToLocalStorage();
+    }
+
+    public changeColour(newColour: string): void {
+        for (const widget of this.widgets) {
+            if (widget.getIsSelected()) {
+                if (!(widget instanceof WorktopWidget)) {
+                    widget.setMaterial(newColour);
+                }
+            }
+        }
+    }
+
+    public changeWorktopMaterial(newMaterial: string): void {
+        for (const widget of this.widgets) {
+            if (widget.getIsSelected()) {
+                if (widget instanceof WorktopWidget) {
+                    widget.setWorktopMaterial(newMaterial);
+                }
+            }
+        }
     }
 }

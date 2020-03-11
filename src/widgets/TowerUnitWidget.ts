@@ -1,6 +1,6 @@
 import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
-import { History } from "engine/History"
+import { History } from "engine/History";
 import { IModelData } from "data/ModelData";
 
 export class TowerUnitWidget extends Widget {
@@ -9,14 +9,14 @@ export class TowerUnitWidget extends Widget {
     protected type = "tower unit";
     material: string = "#FFFFFF";
 
-    constructor(eventBus: EventBus, history: History, model: IModelData, id: number) {
+    constructor(
+        eventBus: EventBus,
+        history: History,
+        model: IModelData,
+        id: number
+    ) {
         super(eventBus, history, model, id);
-
-        this.borderColour = "#72757B";
-        this.fillColour = "#FCE5F1";
     }
 
-    public update(_eventBus: EventBus): void {
-
-    }
+    public update(_eventBus: EventBus): void {}
 }

@@ -1,6 +1,6 @@
 import { Widget } from "widgets/Widget";
 import { EventBus } from "engine/EventBus";
-import { History } from "engine/History"
+import { History } from "engine/History";
 import { IModelData } from "data/ModelData";
 
 export class WallUnitWidget extends Widget {
@@ -9,11 +9,14 @@ export class WallUnitWidget extends Widget {
     type: string = "wall unit";
     material: string = "#FFFFFF";
 
-    constructor(eventBus: EventBus, history: History, model: IModelData, id: number) {
+    constructor(
+        eventBus: EventBus,
+        history: History,
+        model: IModelData,
+        id: number
+    ) {
         super(eventBus, history, model, id);
     }
 
-    public update(_eventBus: EventBus) {
-
-    }
+    public update(_eventBus: EventBus) {}
 }

@@ -50,7 +50,6 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
     ) {
         super(eventBus, history, model, id);
         this.material = model.material;
-        this.borderColour = this.material;
         this.borderColour = WORKTOP_MATERIAL_BORDER_COLOUR.get(model.material)!;
 
         //prettier-ignore
@@ -103,7 +102,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
                 transformPolygonInPlace(polygon, transformMatrix);
                 const fillColour = "rgb(0, 255, 0, 0.2)";
                 const borderColour = "green";
-                render2dPolygon(context, polygon, fillColour, borderColour);
+                render2dPolygon(context, polygon, fillColour, borderColour, 1);
             }
         }
     }
@@ -332,18 +331,6 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             !this.rightBoxSelected
         ) {
             super.handleMouseDown(mouse);
-
-            if (this.boundingBox.containsPointInXZ(mouse.position)) {
-                const centrePoint = Vec2.New(
-                    this.model.transform.translation.x,
-                    this.model.transform.translation.z
-                );
-                this.mouseDragOffset = centrePoint.sub(mouse.position);
-                this.isDragging = true;
-                this.isSelected = true;
-            } else {
-                this.isSelected = false;
-            }
         }
     }
 
