@@ -25,8 +25,9 @@ function createReactDivElement(): HTMLDivElement {
  * Creates the canvas element and initialises the event listeners for user input.
  */
 function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
+    const heightOfMenuBar = 130;
     const canvas = document.createElement("canvas");
-    canvas.height = window.innerHeight - 130;
+    canvas.height = window.innerHeight - heightOfMenuBar;
     canvas.width = window.innerWidth;
     document.body.appendChild(canvas);
 
