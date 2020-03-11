@@ -326,17 +326,8 @@ export class WorktopWidget extends Widget {
             !this.bottomBoxSelected &&
             !this.rightBoxSelected
         ) {
-            if (this.boundingBox.containsPointInXZ(mouse.position)) {
-                const centrePoint = Vec2.New(
-                    this.transform.translation.x,
-                    this.transform.translation.z
-                );
-                this.mouseDragOffset = centrePoint.sub(mouse.position);
-                this.isDragging = true;
-                this.isSelected = true;
-            } else {
-                this.isSelected = false;
-            }
+           super.handleMouseDown(mouse)
+
         }
     }
 

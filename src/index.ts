@@ -51,7 +51,7 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
         mouseEventData.position.x = mouseEvent.clientX - rect.left;
         mouseEventData.position.z = mouseEvent.clientY - rect.top;
         eventBus.publish(eventType, mouseEventData);
-    }
+    };
 
     canvas.addEventListener("mousedown", mouseEvent => {
         mouseEventHelper(MouseDown, mouseEventData, mouseEvent)

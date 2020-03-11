@@ -9,6 +9,7 @@ export class ItemIdGenerator {
      */
     public releaseId = (id: number): void => {
         this.idsToReuse.add(id);
+        console.log('ids available for reuse: ' + this.idsToReuse)
     };
 
     public setMaxId = (widgets: Widget[]) => {

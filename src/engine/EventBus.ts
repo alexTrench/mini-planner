@@ -11,12 +11,16 @@ export const MouseUp = Symbol("MouseUp");
 export const MouseMove = Symbol("MouseMove");
 export const KeyPress = Symbol("KeyPress");
 export const NewPlan = Symbol("NewPlan");
+export const SavePlan = Symbol("SavePlan");
 export const SpawnWidget = Symbol("SpawnWidget");
+export const DeleteWidget = Symbol("DeleteWidget");
 
 // Define some data type for the messages.
 export interface IMouseEventData {
     position: Vec2;
 }
+
+
 
 function createUnsubscribeFn(
     subscriptions: Map<symbol, Set<Listener<any>>>,
@@ -45,6 +49,7 @@ export class EventBus {
         event: typeof MouseUp,
         fn: Listener<[IMouseEventData]>
     ): UnsubscribeFn;
+    public subscribe(event: typeof MouseUp, fn: Listener<[IMouseEventData]>): UnsubscribeFn;
     public subscribe(
         event: typeof MouseMove,
         fn: Listener<[IMouseEventData]>
@@ -54,6 +59,8 @@ export class EventBus {
         fn: Listener<[IKeyboardEventData]>
     ): UnsubscribeFn;
     public subscribe(event: typeof NewPlan, fn: Listener): UnsubscribeFn;
+    public subscribe(event: typeof SavePlan, fn: Listener): UnsubscribeFn;
+    public subscribe(event: typeof DeleteWidget, fn: Listener): UnsubscribeFn;
     public subscribe(
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
@@ -89,7 +96,10 @@ export class EventBus {
         KeyboardEventData: IKeyboardEventData,
     ): void;
     public publish(event: typeof NewPlan): void;
+    public publish(event: typeof SavePlan): void;
+    public publish(event: typeof DeleteWidget): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
+
 
     /**
      * Publish events and trigger the listener functions.

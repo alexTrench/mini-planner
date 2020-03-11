@@ -79,6 +79,10 @@ export abstract class Widget {
         );
     }
 
+    public getIsSelected(): boolean {
+        return this.isSelected;
+    }
+
     public getId(): number {
         return this.id;
     }
@@ -92,13 +96,15 @@ export abstract class Widget {
             this.mouseDragOffset = centrePoint.sub(mouse.position);
             this.mouseDragStart = centrePoint;
             this.isDragging = true;
+            this.isSelected = !this.isSelected;
         }
+
     }
 
     public handleMouseUp(mouse: IMouseEventData, history: History): void {
         if (this.boundingBox.containsPointInXZ(mouse.position)) {
-            const { x: tx, z: tz } = this.transform.translation;
-            const { x: mx, z: mz } = this.mouseDragStart;
+            const {x: tx, z: tz} = this.transform.translation;
+            const {x: mx, z: mz} = this.mouseDragStart;
 
             if (this.skipSuperMove) {
                 this.skipSuperMove = false;
@@ -115,7 +121,6 @@ export abstract class Widget {
                 }
             }
         }
-        
         this.isDragging = false;
     }
 
@@ -162,7 +167,13 @@ export abstract class Widget {
         const transformMatrix = this.transform.getTransformationMatrix();
         transformPolygonInPlace(polygon, transformMatrix);
         const { fillColour, borderColour } = this;
-        render2dPolygon(context, polygon, fillColour, borderColour);
+        //testing purposes only
+        if(this.isSelected) {
+            render2dPolygon(context, polygon, '#b3ffff', 'black');
+        }else{
+            render2dPolygon(context, polygon, fillColour, borderColour);
+        }
+
 
         // temp drawing of bounding box - uncomment below to draw bounding box
 
