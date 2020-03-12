@@ -19,7 +19,7 @@ export class AxisAlignedBoundingBox {
             .sub(box.transform.translation)
             .abs();
 
-        const {x: scaleX, y: scaleY, z: scaleZ} = this.transform.scale;
+        const { x: scaleX, y: scaleY, z: scaleZ } = this.transform.scale;
 
         const collidesOnX =
             centreDifference.x <=
@@ -44,7 +44,7 @@ export class AxisAlignedBoundingBox {
             this.transform.translation.z
         );
 
-        const {x: scaleX, z: scaleZ} = this.transform.scale;
+        const { x: scaleX, z: scaleZ } = this.transform.scale;
 
         const centreDifference = xZPlane.sub(point).abs();
 
@@ -65,9 +65,9 @@ export class AxisAlignedBoundingBox {
     }
 
     public setDimensions(width: number, height: number, depth: number): void {
-        this.halfWidth = width;
-        this.halfHeight = height;
-        this.halfDepth = depth;
+        this.halfWidth = width / 2;
+        this.halfHeight = height / 2;
+        this.halfDepth = depth / 2;
     }
 
     public setPosition(x: number, y: number, z: number): void {

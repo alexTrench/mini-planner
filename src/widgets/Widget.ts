@@ -11,6 +11,11 @@ import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
 import { IDefaultWidgetInfo } from "engine/IWidgetObject";
 import { IModelData } from "data/DefaultModelData";
+import {
+    createRectanglePolygon,
+    transformPolygonInPlace
+} from "engine/PolygonHelpers";
+import { render2dPolygon } from "engine/RenderHelpers";
 
 export abstract class Widget {
     public transform: Transform;
@@ -23,7 +28,7 @@ export abstract class Widget {
     protected abstract borderColour: string;
     protected abstract type: string;
     protected abstract material: string;
-    private mouseDragOffset: Vec2 = Vec2.New(0, 0);
+    protected mouseDragOffset: Vec2 = Vec2.New(0, 0);
 
     // Maybe add other colours for things?
     boundingBox: AxisAlignedBoundingBox;
@@ -107,12 +112,14 @@ export abstract class Widget {
         this.dimensions.x = width;
         this.dimensions.y = height;
         this.dimensions.z = depth;
+        this.boundingBox.setDimensions(width, height, depth);
     }
 
     public setPosition(x: number, y: number, z: number): void {
         this.transform.translation.x = x;
         this.transform.translation.y = y;
         this.transform.translation.z = z;
+        this.boundingBox.setPosition(x, y, z);
     }
 
     public setRotationY(y: number): void {
@@ -124,73 +131,17 @@ export abstract class Widget {
         this.transform.scale.y = y;
         this.transform.scale.z = z;
     }
-    /*
-       To be used in rendering Vec2 widgets
-     */
-    public renderTwoDimensionPolygon(
-        context: CanvasRenderingContext2D,
-        fillColour: string,
-        borderColour: string
-    ) {
-        const halfWidth = this.dimensions.x / 2;
-        const halfHeight = this.dimensions.z / 2;
-
-        const polygon = [
-            Vec2.New(-halfWidth, -halfHeight),
-            Vec2.New(halfWidth, -halfHeight),
-            Vec2.New(halfWidth, halfHeight),
-            Vec2.New(-halfWidth, halfHeight)
-        ];
-
-        const transformMatrix = this.transform.getTransformationMatrix();
-
-        for (const point of polygon) {
-            point.transformInPlace(transformMatrix);
-        }
-
-        context.fillStyle = fillColour;
-        context.strokeStyle = borderColour;
-        context.beginPath();
-
-        context.moveTo(polygon[0].x, polygon[0].z);
-
-        for (const point of polygon) {
-            context.lineTo(point.x, point.z);
-        }
-
-        context.closePath();
-        context.stroke();
-        context.fill();
-
-        // temp drawing of bounding box - uncomment the below to draw bounding boxes
-
-        // const polygon2 = [
-        //     Vec2.New(-this.boundingBox.halfWidth, -this.boundingBox.halfDepth),
-        //     Vec2.New(this.boundingBox.halfWidth, -this.boundingBox.halfDepth),
-        //     Vec2.New(this.boundingBox.halfWidth, this.boundingBox.halfDepth),
-        //     Vec2.New(-this.boundingBox.halfWidth, this.boundingBox.halfDepth)
-        // ];
-
-        // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
-
-        // for (const point of polygon2) {
-        //     point.transformInPlace(transformMatrix2);
-        // }
-
-        // context.beginPath();
-        // context.moveTo(polygon2[0].x, polygon2[0].z);
-        // for (const point of polygon2) {
-        //     context.lineTo(point.x, point.z);
-        // }
-        // context.closePath();
-        // context.fillStyle = "red";
-        // context.fill();
-        // context.strokeStyle = "black";
-        // context.stroke();
-    }
 
     public abstract update(eventBus: EventBus): void;
-    public abstract render(context: CanvasRenderingContext2D): void;
+
+    public render(context: CanvasRenderingContext2D): void {
+        const { x, z } = this.dimensions;
+        const polygon = createRectanglePolygon(x / 2, z / 2);
+        const transformMatrix = this.transform.getTransformationMatrix();
+        transformPolygonInPlace(polygon, transformMatrix);
+        const { fillColour, borderColour } = this;
+        render2dPolygon(context, polygon, fillColour, borderColour);
+    }
 
     public toJSON(): IDefaultWidgetInfo {
         const { x: tx, y: ty, z: tz } = this.transform.translation;
@@ -204,13 +155,11 @@ export abstract class Widget {
             type: this.type,
             material: this.material
         };
-
         return widgetInfo;
     }
 
-    public hasCollided(box: AxisAlignedBoundingBox) {
-        let isCollided = box.intersectsBoundingBox(this.boundingBox);
-        isCollided ? console.log(isCollided) : null;
+    public hasCollided(box: AxisAlignedBoundingBox): boolean {
+        return box.intersectsBoundingBox(this.boundingBox);
     }
 
     public getBox(): AxisAlignedBoundingBox {

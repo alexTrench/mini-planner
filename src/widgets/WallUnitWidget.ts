@@ -16,13 +16,4 @@ export class WallUnitWidget extends Widget {
     public update(_eventBus: EventBus) {
 
     }
-
-    public render(context: CanvasRenderingContext2D): void {
-        this.renderTwoDimensionPolygon(
-            context,
-            this.fillColour,
-            this.borderColour
-        );
-    }
-
 }

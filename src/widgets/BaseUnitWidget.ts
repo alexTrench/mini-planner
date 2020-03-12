@@ -13,12 +13,4 @@ export class BaseUnitWidget extends Widget {
     material: string = "#FFFFFF";
 
     public update() {}
-
-    public render(context: CanvasRenderingContext2D): void {
-        this.renderTwoDimensionPolygon(
-            context,
-            this.fillColour,
-            this.borderColour
-        );
-    }
 }
