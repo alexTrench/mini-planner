@@ -164,11 +164,12 @@ export abstract class Widget {
         const { fillColour, borderColour } = this;
         render2dPolygon(context, polygon, fillColour, borderColour);
 
-        const polygon2 = createRectanglePolygon(x / 2, z / 2);
-        const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
-        transformPolygonInPlace(polygon2, transformMatrix2);
-        // const { fillColour, borderColour } = this;
-        render2dPolygon(context, polygon2, "red", "red");
+        // temp drawing of bounding box - uncomment below to draw bounding box
+
+        // const polygon2 = createRectanglePolygon(x / 2, z / 2);
+        // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
+        // transformPolygonInPlace(polygon2, transformMatrix2);
+        // render2dPolygon(context, polygon2, "red", "red");
     }
 
     public toJSON(): IDefaultWidgetInfo {
