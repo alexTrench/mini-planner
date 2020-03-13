@@ -60,6 +60,45 @@ export class Vec2 {
     }
 
     // Extend me with useful methods like dot, normalise, add, etc...
+    public perpRight(): Vec2 {
+        return Vec2.New(this.z, -this.x);
+    }
+
+    public perpLeft(): Vec2 {
+        return Vec2.New(-this.z, this.x);
+    }
+
+    public dotProduct(other: Vec2): number {
+        const x = other.x * this.x;
+        const z = other.z * this.z;
+
+        return x + z;
+    }
+
+    public mid(other: Vec2): Vec2 {
+        const x = (this.x + other.x) / 2;
+        const z = (this.z + other.z) / 2;
+
+        return Vec2.New(x, z);
+    }
+
+    public getMagnitude(): number {
+        return Math.sqrt(this.dotProduct(this));
+    }
+
+    public normaliseInPlace(): this {
+        const magnitude = this.getMagnitude();
+
+        this.x /= magnitude;
+        this.z /= magnitude;
+
+        return this;
+    }
+
+    public normalise(): Vec2 {
+        return this.clone().normaliseInPlace();
+    }
+
     public subInPlace(other: Vec2): this {
         this.x -= other.x;
         this.z -= other.z;

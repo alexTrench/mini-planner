@@ -43,13 +43,19 @@ export interface IWorktopModelData extends IModelData {
     material: WorktopMaterial;
 }
 
-export function createModel(module: WidgetModule, dimensions: Vec3, transform: Transform, material: string, widgetType: WidgetType): IModelData {
+export function createModel(
+    module: WidgetModule,
+    dimensions: Vec3,
+    transform: Transform,
+    material: string,
+    widgetType: WidgetType
+): IModelData {
     return {
         module,
         dimensions,
         transform,
         material,
-        widgetType,
+        widgetType
     };
 }
 
@@ -64,7 +70,7 @@ export function createWorktopModel(
         dimensions,
         transform,
         material,
-        widgetType,
+        widgetType
     };
 }
 
@@ -118,7 +124,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
             WidgetModule.WallUnit,
             Vec3.New(600, 720, 400),
             new Transform(
-                Vec3.New(400, 1160, 400),
+                Vec3.New(400, 232, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
@@ -132,7 +138,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
             WidgetModule.WallUnit,
             Vec3.New(600, 720, 330),
             new Transform(
-                Vec3.New(400, 1160, 400),
+                Vec3.New(400, 232, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
@@ -173,7 +179,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
         createWorktopModel(
             Vec3.New(3000, 40, 600),
             new Transform(
-                Vec3.New(400, 720, 400),
+                Vec3.New(400, 144, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
@@ -186,7 +192,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
         createWorktopModel(
             Vec3.New(3000, 40, 600),
             new Transform(
-                Vec3.New(400, 720, 400),
+                Vec3.New(400, 144, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
@@ -228,7 +234,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
             WidgetModule.DecorPanel,
             Vec3.New(20, 720, 400),
             new Transform(
-                Vec3.New(400, 1160, 400),
+                Vec3.New(400, 232, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
@@ -242,7 +248,7 @@ export const DEFAULT_WIDGET_MODEL_DATA: ReadonlyMap<
             WidgetModule.DecorPanel,
             Vec3.New(20, 720, 330),
             new Transform(
-                Vec3.New(400, 1160, 400),
+                Vec3.New(400, 232, 400),
                 defaultRotation,
                 defaultScaleVector
             ),
