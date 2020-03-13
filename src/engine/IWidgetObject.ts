@@ -27,7 +27,7 @@ export interface IDefaultWidgetInfo {
     rotation: number;
     type: string;
     material: string;
-    WidgetType: WidgetType;
+    widgetType: WidgetType;
 }
 
 export interface IWorktopWidgetInfo extends IDefaultWidgetInfo {

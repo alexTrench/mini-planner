@@ -59,12 +59,7 @@ export function createModel(
     };
 }
 
-export function createWorktopModel(
-    dimensions: Vec3,
-    transform: Transform,
-    material: WorktopMaterial,
-    widgetType: WidgetType
-): IWorktopModelData {
+export function createWorktopModel(dimensions: Vec3, transform: Transform, material: WorktopMaterial, widgetType: WidgetType): IWorktopModelData {
     return {
         module: WidgetModule.Worktop,
         dimensions,

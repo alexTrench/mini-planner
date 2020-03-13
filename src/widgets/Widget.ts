@@ -190,7 +190,7 @@ export abstract class Widget<Model extends IModelData = IModelData> {
             rotation: transform.rotation,
             type,
             material,
-            WidgetType: this.model.widgetType
+            widgetType: this.model.widgetType
         };
         return widgetInfo;
     }

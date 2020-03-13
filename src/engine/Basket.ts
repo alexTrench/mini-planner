@@ -2,8 +2,11 @@ import {Widget} from "widgets/Widget";
 import {WidgetType} from "data/ModelData";
 import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
 import {WorktopWidget} from "widgets/WorktopWidget";
+import {BasketStateUpdated, EventBus} from "engine/EventBus";
 
-interface IBasketArray {
+
+export interface IBasketItem {
+    id: number;
     widgetType: WidgetType;
     widgetMaterial: string;
     width?: number;
@@ -13,13 +16,13 @@ interface IBasketArray {
 
 export class Basket {
 
-
     protected worktopMaterialPrices: ReadonlyMap<WorktopMaterial, number> = new Map(
         [
             [WorktopMaterial.AfricanTeak, 50],
             [WorktopMaterial.CementNoir, 70]
         ]
     );
+
     protected unitTypePrices: ReadonlyMap<WidgetType, number> = new Map([
         [WidgetType.WallUnitA, 20],
         [WidgetType.WallUnitB, 40],
@@ -36,18 +39,13 @@ export class Basket {
 
     ]);
 
-    protected basketWidgets: IBasketArray[] = [];
+    protected basketWidgets: IBasketItem[] = [];
 
-
-    constructor(private widgets: Array<Widget>) {
-        this.widgets = widgets;
-    }
-
-    public convertMillimetersToMeters(value: number){
+    public convertMillimetersToMeters(value: number): number {
         return value / 1000;
     }
 
-    public calculateWorktopPrice(pricePerSquareMeter: number, width: number, height: number) {
+    public calculateWorktopPrice(pricePerSquareMeter: number, width: number, height: number): string {
         // mm to metres
         const widthInMetres = this.convertMillimetersToMeters(width);
         const depthInMetres = this.convertMillimetersToMeters(height);
@@ -55,13 +53,17 @@ export class Basket {
         return (worktopSquareMetres * pricePerSquareMeter).toFixed(2);
     }
 
-    public calculateBasket() {
-        for (const widget of this.widgets) {
+    private calculateBasket(widgets: Widget[]): IBasketItem[] {
+        this.basketWidgets =[];
+        const basketItems: IBasketItem[] = [];
+
+        for (const widget of widgets) {
             const {x, z} = widget.model.dimensions;
             if (widget instanceof WorktopWidget) {
                 const worktopPricePerMeter = this.worktopMaterialPrices.get(widget.model.material!);
                 const worktopPrice = this.calculateWorktopPrice(worktopPricePerMeter!, x, z);
                 const widgetInfo = {
+                    id: widget.id,
                     widgetType: widget.model.widgetType,
                     width: x, height: z,
                     widgetMaterial: widget.model.material,
@@ -75,6 +77,7 @@ export class Basket {
                 const basketType = widget.model.widgetType;
                 const unitPrice = this.unitTypePrices.get(basketType);
                 const widgetInfo = {
+                    id: widget.id,
                     widgetType: basketType,
                     widgetMaterial: widget.model.material,
                     price: unitPrice
@@ -82,15 +85,25 @@ export class Basket {
 
                 this.basketWidgets.push(widgetInfo);
             }
-            //included for use of testing until UI is developed.
-            console.log(this.basketWidgets)
         }
+        return basketItems;
     }
 
-    public updateBasketFromKitchen(widgets: Array<Widget>) {
-        this.widgets = widgets;
-        this.basketWidgets = [];
-        this.calculateBasket();
+    public updateBasketFromKitchen(widgets: Widget[], eventBus: EventBus): void {
+        const basketItems = this.calculateBasket(widgets);
+        eventBus.publish(BasketStateUpdated, basketItems);
+    }
+
+    public getBasketContents(): IBasketItem[] {
+        return this.basketWidgets;
+    }
+
+    public calculateTotal(): number {
+        let total: number = 0;
+        for (const widget of this.basketWidgets){
+            total += Number(widget.price);
+        }
+        return total;
     }
 
 }

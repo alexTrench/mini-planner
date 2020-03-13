@@ -30,17 +30,17 @@ import {
 import { Transform } from "engine/Transform";
 import { Vec3 } from "engine/Vec3";
 import { WorktopMaterial } from "data/WorktopMaterialBorderDisplayColour";
-import { SAT } from "engine/SAT";
+// import { SAT } from "engine/SAT";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
     private planName?: string;
-    private basket = new Basket(this.widgets);
     private shiftPressed: boolean = false;
 
-    constructor(eventBus: EventBus, history: History) {
-        eventBus.subscribe(NewPlan, this.newPlan.bind(this));
+    constructor(eventBus: EventBus, history: History, private basket: Basket) {
+
+
         eventBus.subscribe(SavePlan, this.savePlan.bind(this));
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
@@ -55,7 +55,7 @@ export class Kitchen {
             this.spawnFromMenu(eventBus, type, history)
         );
         eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
-        eventBus.subscribe(MouseUp, () => this.updateBasket());
+        eventBus.subscribe(MouseUp, () => this.updateBasket(eventBus));
 
         if (this.hasPlanInLocalStorage()) {
             this.spawnFromLocalStorage(eventBus, history);
@@ -66,19 +66,19 @@ export class Kitchen {
     public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
             widget.update(eventBus);
-            const polygon = widget.getPoly();
+            // const polygon = widget.getPoly();
 
-            for (const widgetB of this.widgets) {
-                if (widget !== widgetB) {
-                    let hasCollided = false;
-
-                    if (widget.getBox().intersectsBoundingBox(widgetB.getBox())) {
-                        const polygonB = widgetB.getPoly();
-                        hasCollided = SAT(polygon, polygonB);
-                    }
-                    hasCollided;
-                }
-            }
+            // for (const widgetB of this.widgets) {
+            //     if (widget !== widgetB) {
+            //         let hasCollided = false;
+            //
+            //         if (widget.getBox().intersectsBoundingBox(widgetB.getBox())) {
+            //             const polygonB = widgetB.getPoly();
+            //             hasCollided = SAT(polygon, polygonB);
+            //         }
+            //         console.log(hasCollided);
+            //     }
+            // }
         }
     }
 
@@ -137,16 +137,17 @@ export class Kitchen {
         }
     }
 
+
     public hasPlanInLocalStorage(): boolean {
         return Boolean(localStorage.getItem("widgets"));
     }
 
-    public addToLocalStorage(): void {
-        localStorage.setItem("widgets", JSON.stringify(this.widgets));
-    }
-
     public clearLocalStorage(): void {
         localStorage.removeItem("widgets");
+    }
+
+    public addToLocalStorage(): void {
+        localStorage.setItem("widgets", JSON.stringify(this.widgets));
     }
 
     public toJSON(): IKitchenInfo {
@@ -183,16 +184,15 @@ export class Kitchen {
         this.itemIdGenerator.setMaxId(this.widgets);
     };
 
-    protected updateBasket() {
-        this.basket.updateBasketFromKitchen(this.widgets);
+    protected updateBasket(eventBus: EventBus) {
+        this.basket.updateBasketFromKitchen(this.widgets, eventBus);
     }
 
     private spawnFromLocalStorage(eventBus: EventBus, history: History): void {
-        const storedWidgets = JSON.parse(
-            localStorage.getItem("widgets")!
-        ) as IDefaultWidgetInfo[];
-        for (const widget of storedWidgets) {
-            const {
+        this.widgets = [];
+        const storedWidgets = JSON.parse(localStorage.getItem("widgets")!) as IDefaultWidgetInfo[];
+        for(const widget of storedWidgets) {
+            const  {
                 rotation,
                 position,
                 dimensions: storedDimensions,
@@ -200,7 +200,7 @@ export class Kitchen {
                 id,
                 module,
                 material,
-                WidgetType
+                widgetType
             } = widget;
 
             const { x, y, z } = position;
@@ -221,21 +221,10 @@ export class Kitchen {
                 case "wall unit":
                 case "tower unit":
                 case "decor panel":
-                    model = createModel(
-                        module,
-                        dimensions,
-                        transform,
-                        material,
-                        WidgetType
-                    );
+                    model = createModel(module, dimensions, transform, material, widgetType);
                     break;
                 case "worktop":
-                    model = createWorktopModel(
-                        dimensions,
-                        transform,
-                        material as WorktopMaterial,
-                        WidgetType
-                    );
+                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial, widgetType);
                     break;
                 default:
                     throw new Error(`Unknown widget type ${type}`);
@@ -278,14 +267,13 @@ export class Kitchen {
         const Widget = this.getWidgetConstructor(model.module);
         const widget = new Widget(eventBus, history, model, id);
         history.saveSpawnAction(ActionType.Spawn, widget.getId(), widget);
-        this.basket = new Basket(this.widgets);
 
         this.widgets.push(widget);
         this.widgets.sort(
             (a, b): any =>
                 a.model.transform.translation.y -
-                b.model.transform.translation.y
-        );
+                b.model.transform.translation.y);
+        this.updateBasket(eventBus);
     }
 
     public savePlan = async () => {
@@ -319,7 +307,7 @@ export class Kitchen {
             }
         });
 
-        let selectMaxWidgetFound: boolean = false;
+        let selectMaxWidgetFound = false;
         let maxSelectedIndex = -Infinity;
 
         for (let i = 0; i < tempWidgets.length; i += 1) {

@@ -4,14 +4,11 @@ export class ItemIdGenerator {
     private maxIdInUse = 0;
     private idsToReuse = new Set();
 
-    /**
-     *To be used when widgets can be deleted by user.
-     */
     public releaseId = (id: number): void => {
         this.idsToReuse.add(id);
     };
 
-    public setMaxId = (widgets: Widget[]) => {
+    public setMaxId = (widgets: Widget[]): void => {
         this.maxIdInUse = widgets.length;
     };
 
@@ -20,7 +17,7 @@ export class ItemIdGenerator {
         return this.maxIdInUse;
     };
 
-    private getReusedId = () => {
+    private getReusedId = (): number => {
         const idRetrieved: number = this.idsToReuse.values().next().value;
 
         this.idsToReuse.delete(idRetrieved);
@@ -28,7 +25,7 @@ export class ItemIdGenerator {
         return idRetrieved;
     };
 
-    public getUniqueWidgetId() {
+    public getUniqueWidgetId(): number {
         const newId =
             this.idsToReuse.size > 0
                 ? this.getReusedId()

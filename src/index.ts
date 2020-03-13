@@ -12,8 +12,9 @@ import { Vec2 } from "engine/Vec2";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Root } from "ui/Root";
-import { History } from "engine/History";
-import { IKeyboardEventData, populateKeyboardData } from "engine/Keyboard";
+import { History } from 'engine/History'
+import { IKeyboardEventData, populateKeyboardData } from 'engine/Keyboard';
+import {Basket} from "engine/Basket";
 
 /**
  * Creates the div element for the React components
@@ -29,10 +30,13 @@ function createReactDivElement(): HTMLDivElement {
  * Creates the canvas element and initialises the event listeners for user input.
  */
 function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
-    const heightOfMenuBar = 130;
+    const widthOfBasketDrawer = 230;
+    const widthOfMenuDrawer = 230;
+    const drawerWidth = widthOfBasketDrawer + widthOfMenuDrawer;
     const canvas = document.createElement("canvas");
-    canvas.height = window.innerHeight - heightOfMenuBar;
-    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth - drawerWidth;
+    canvas.style.marginLeft = widthOfMenuDrawer + "px";
     document.body.appendChild(canvas);
 
     const mouseEventData: IMouseEventData = {
@@ -96,8 +100,9 @@ function main(): void {
     const eventBus = new EventBus();
     const canvas = createAndInitialiseCanvas(eventBus);
     const context = canvas.getContext("2d")!;
-    const kitchen = new Kitchen(eventBus, history);
-    ReactDOM.render(React.createElement(Root, { eventBus }), ui);
+    const basket = new Basket();
+    const kitchen = new Kitchen(eventBus, history, basket);
+    ReactDOM.render(React.createElement(Root, { eventBus, basket }), ui);
 
     //temporary debugging
     //@ts-ignore
