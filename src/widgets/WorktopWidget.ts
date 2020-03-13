@@ -12,7 +12,7 @@ import {
 } from "engine/PolygonHelpers";
 import { render2dPolygon } from "engine/RenderHelpers";
 import { History, ActionType } from "engine/History";
-import { eq } from 'engine/FloatHelpers';
+import { eq } from "engine/FloatHelpers";
 import { IWorktopModelData } from "data/ModelData";
 
 export class WorktopWidget extends Widget<IWorktopModelData> {
@@ -136,7 +136,10 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             this.model.transform.translation.z
         );
         this.mouseDragStart = centrePoint;
-        this.previousDimension = Vec2.New(this.model.dimensions.x, this.model.dimensions.z);
+        this.previousDimension = Vec2.New(
+            this.model.dimensions.x,
+            this.model.dimensions.z
+        );
         //left side box
         this.checkLeft(mouse);
         //right side box
@@ -162,7 +165,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         const { x: dx, z: dz } = this.model.dimensions;
         const { x: px, z: pz } = this.previousDimension;
 
-        if(!eq(dx, px) || !eq(dz, pz)) {
+        if (!eq(dx, px) || !eq(dz, pz)) {
             const { x: tx, z: tz } = this.model.transform.translation;
             const { x: mx, z: mz } = this.mouseDragStart;
 
@@ -230,7 +233,10 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
     }
 
     private drag(mouse: IMouseEventData) {
-        const { x: transformX, z: transformZ } = this.model.transform.translation;
+        const {
+            x: transformX,
+            z: transformZ
+        } = this.model.transform.translation;
         const { x: dimensionsX, z: dimensionsZ } = this.model.dimensions;
         const { x: scaleX, z: scaleZ } = this.model.transform.scale;
         //left of the box
@@ -325,7 +331,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
             !this.bottomBoxSelected &&
             !this.rightBoxSelected
         ) {
-           super.handleMouseDown(mouse)
+            super.handleMouseDown(mouse);
 
             if (this.boundingBox.containsPointInXZ(mouse.position)) {
                 const centrePoint = Vec2.New(
@@ -372,22 +378,30 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.topBoundingBox.setPosition(
             x,
             y,
-            z - (this.model.dimensions.z / 2  - this.resizingWidgetSize) * this.model.transform.scale.z
+            z -
+                (this.model.dimensions.z / 2 - this.resizingWidgetSize) *
+                    this.model.transform.scale.z
         );
         this.rightBoundingBox.setPosition(
-            x + (this.model.dimensions.x / 2 - this.resizingWidgetSize) * this.model.transform.scale.x,
+            x +
+                (this.model.dimensions.x / 2 - this.resizingWidgetSize) *
+                    this.model.transform.scale.x,
             y,
             z
         );
         this.leftBoundingBox.setPosition(
-            x - (this.model.dimensions.x / 2 - this.resizingWidgetSize) * this.model.transform.scale.x,
+            x -
+                (this.model.dimensions.x / 2 - this.resizingWidgetSize) *
+                    this.model.transform.scale.x,
             y,
             z
         );
         this.bottomBoundingBox.setPosition(
             x,
             y,
-            z + (this.model.dimensions.z / 2 - this.resizingWidgetSize) * this.model.transform.scale.z
+            z +
+                (this.model.dimensions.z / 2 - this.resizingWidgetSize) *
+                    this.model.transform.scale.z
         );
     }
 }

@@ -1,5 +1,5 @@
 import { Vec2 } from "engine/Vec2";
-import { IKeyboardEventData } from 'engine/Keyboard';
+import { IKeyboardEventData } from "engine/Keyboard";
 import { WidgetType } from "data/ModelData";
 
 type Listener<Args extends any[] = []> = (...args: Args) => void;
@@ -15,13 +15,12 @@ export const SavePlan = Symbol("SavePlan");
 export const SpawnWidget = Symbol("SpawnWidget");
 export const DeleteWidget = Symbol("DeleteWidget");
 export const SpawnFromLocalStore = Symbol("SpawnFromLocalStore");
+export const KeyUp = Symbol("KeyUp");
 
 // Define some data type for the messages.
 export interface IMouseEventData {
     position: Vec2;
 }
-
-
 
 function createUnsubscribeFn(
     subscriptions: Map<symbol, Set<Listener<any>>>,
@@ -50,7 +49,10 @@ export class EventBus {
         event: typeof MouseUp,
         fn: Listener<[IMouseEventData]>
     ): UnsubscribeFn;
-    public subscribe(event: typeof MouseUp, fn: Listener<[IMouseEventData]>): UnsubscribeFn;
+    public subscribe(
+        event: typeof MouseUp,
+        fn: Listener<[IMouseEventData]>
+    ): UnsubscribeFn;
     public subscribe(
         event: typeof MouseMove,
         fn: Listener<[IMouseEventData]>
@@ -66,8 +68,14 @@ export class EventBus {
         event: typeof SpawnWidget,
         fn: Listener<[WidgetType]>
     ): UnsubscribeFn;
-    public  subscribe(event: typeof SpawnFromLocalStore, fn: Listener<any>) :UnsubscribeFn;
-
+    public subscribe(
+        event: typeof SpawnFromLocalStore,
+        fn: Listener<any>
+    ): UnsubscribeFn;
+    public subscribe(
+        event: typeof KeyUp,
+        fn: Listener<[IKeyboardEventData]>
+    ): UnsubscribeFn;
     /**
      * Subscribe to an event to be notified when a specific event is emitted.
      * Events that were submitted before this subscription was created will not be received.
@@ -88,22 +96,27 @@ export class EventBus {
         event: typeof MouseDown,
         mouseEventData: IMouseEventData
     ): void;
-    public publish(event: typeof MouseUp, mouseEventData: IMouseEventData): void;
+    public publish(
+        event: typeof MouseUp,
+        mouseEventData: IMouseEventData
+    ): void;
     public publish(
         event: typeof MouseMove,
         mouseEventData: IMouseEventData
     ): void;
     public publish(
         event: typeof KeyPress,
-        KeyboardEventData: IKeyboardEventData,
+        KeyboardEventData: IKeyboardEventData
     ): void;
     public publish(event: typeof NewPlan): void;
     public publish(event: typeof SavePlan): void;
     public publish(event: typeof DeleteWidget): void;
     public publish(event: typeof SpawnWidget, widgetType: WidgetType): void;
     public publish(event: typeof SpawnFromLocalStore): void;
-
-
+    public publish(
+        event: typeof KeyUp,
+        KeyboardEventData: IKeyboardEventData
+    ): void;
     /**
      * Publish events and trigger the listener functions.
      * @param event The event you to publish.

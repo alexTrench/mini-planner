@@ -2,10 +2,22 @@ import { Basket } from "engine/Basket";
 import { ItemIdGenerator } from "engine/ItemIdGenerator";
 import { IDefaultWidgetInfo, IKitchenInfo } from "engine/IWidgetObject";
 import { History, ActionType } from "engine/History";
-import { IKeyboardEventData } from 'engine/Keyboard';
-import { EventBus, MouseUp, MouseDown, NewPlan, SavePlan, KeyPress, SpawnFromLocalStore, SpawnWidget, DeleteWidget, IMouseEventData } from "engine/EventBus";
+import { IKeyboardEventData } from "engine/Keyboard";
+import {
+    EventBus,
+    MouseUp,
+    MouseDown,
+    NewPlan,
+    SavePlan,
+    KeyPress,
+    SpawnFromLocalStore,
+    SpawnWidget,
+    DeleteWidget,
+    IMouseEventData,
+    KeyUp
+} from "engine/EventBus";
 import { assert } from "utility/Assert";
-import {IWidgetConstructor, Widget} from "widgets/Widget";
+import { IWidgetConstructor, Widget } from "widgets/Widget";
 import {
     cloneModel,
     createModel,
@@ -15,43 +27,56 @@ import {
     IModelData,
     WidgetType
 } from "data/ModelData";
-import {Transform} from "engine/Transform";
-import {Vec3} from "engine/Vec3";
-import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
-
+import { Transform } from "engine/Transform";
+import { Vec3 } from "engine/Vec3";
+import { WorktopMaterial } from "data/WorktopMaterialBorderDisplayColour";
+import { SAT } from "engine/SAT";
 
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
     private planName?: string;
     private basket = new Basket(this.widgets);
+    private shiftPressed: boolean = false;
 
     constructor(eventBus: EventBus, history: History) {
-
-
+        eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(SavePlan, this.savePlan.bind(this));
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
+        eventBus.subscribe(KeyUp, e => this.handleKeyUp(e));
         eventBus.subscribe(MouseDown, this.widgetDragStart.bind(this));
         this.itemIdGenerator.setMaxId(this.widgets);
-        eventBus.subscribe(SpawnFromLocalStore, () => this.spawnFromLocalStorage(eventBus, history));
-        eventBus.subscribe(SpawnWidget, type => this.spawnFromMenu(eventBus, type, history));
+        eventBus.subscribe(SpawnFromLocalStore, () =>
+            this.spawnFromLocalStorage(eventBus, history)
+        );
+        eventBus.subscribe(SpawnWidget, type =>
+            this.spawnFromMenu(eventBus, type, history)
+        );
         eventBus.subscribe(MouseUp, () => this.addToLocalStorage());
         eventBus.subscribe(MouseUp, () => this.updateBasket());
 
         if (this.hasPlanInLocalStorage()) {
-                    this.spawnFromLocalStorage(eventBus, history);
-                    this.itemIdGenerator.setMaxId(this.widgets);
-                }
+            this.spawnFromLocalStorage(eventBus, history);
+            this.itemIdGenerator.setMaxId(this.widgets);
+        }
     }
-
+    //prettier-ignore
     public update(eventBus: EventBus): void {
         for (const widget of this.widgets) {
             widget.update(eventBus);
+            const polygon = widget.getPoly();
+
             for (const widgetB of this.widgets) {
                 if (widget !== widgetB) {
-                    widget.hasCollided(widgetB.getBox());
+                    let hasCollided = false;
+
+                    if (widget.getBox().intersectsBoundingBox(widgetB.getBox())) {
+                        const polygonB = widgetB.getPoly();
+                        hasCollided = SAT(polygon, polygonB);
+                    }
+                    hasCollided;
                 }
             }
         }
@@ -70,13 +95,22 @@ export class Kitchen {
             if (widget.boundingBox.containsPointInXZ(mouse.position)) {
                 hoveredWidgets.push(widget);
             }
-            widget.setIsSelected(false);
+            if (!this.shiftPressed) {
+                widget.setIsSelected(false);
+            }
         }
 
         const highestWidget = hoveredWidgets.pop()!;
 
         if (highestWidget) {
             highestWidget.handleMouseDown(mouse);
+        }
+    }
+
+    public handleKeyUp(keyPress: IKeyboardEventData): void {
+        console.log(keyPress);
+        if (keyPress.key === "Shift") {
+            this.shiftPressed = false;
         }
     }
 
@@ -99,9 +133,8 @@ export class Kitchen {
         }
 
         if (shift) {
-
+            this.shiftPressed = true;
         }
-
     }
 
     public hasPlanInLocalStorage(): boolean {
@@ -126,18 +159,9 @@ export class Kitchen {
         for (const widget of this.widgets) {
             const { transform, dimensions } = widget.model;
 
-            w = Math.max(
-                w,
-                transform.translation.x + dimensions.x
-            );
-            h = Math.max(
-                h,
-                transform.translation.y + dimensions.y
-            );
-            d = Math.max(
-                d,
-                transform.translation.z + dimensions.z
-            );
+            w = Math.max(w, transform.translation.x + dimensions.x);
+            h = Math.max(h, transform.translation.y + dimensions.y);
+            d = Math.max(d, transform.translation.z + dimensions.z);
 
             items.push(widget.toJSON());
         }
@@ -145,7 +169,7 @@ export class Kitchen {
         return {
             planName: this.planName!,
             assetUrl: "https://static.wrenkitchens.com/3d-assets-2018-3/webgl/",
-            roomDimensions: {w, d, h},
+            roomDimensions: { w, d, h },
             items
         };
     }
@@ -164,9 +188,11 @@ export class Kitchen {
     }
 
     private spawnFromLocalStorage(eventBus: EventBus, history: History): void {
-        const storedWidgets = JSON.parse(localStorage.getItem("widgets")!) as IDefaultWidgetInfo[];
-        for(const widget of storedWidgets) {
-            const  {
+        const storedWidgets = JSON.parse(
+            localStorage.getItem("widgets")!
+        ) as IDefaultWidgetInfo[];
+        for (const widget of storedWidgets) {
+            const {
                 rotation,
                 position,
                 dimensions: storedDimensions,
@@ -179,7 +205,11 @@ export class Kitchen {
 
             const { x, y, z } = position;
             const translation = Vec3.New(x, y, z);
-            const transform = Transform.New(translation, rotation, defaultScaleVector);
+            const transform = Transform.New(
+                translation,
+                rotation,
+                defaultScaleVector
+            );
 
             const { w, d, h } = storedDimensions;
             const dimensions = Vec3.New(w, h, d);
@@ -191,10 +221,21 @@ export class Kitchen {
                 case "wall unit":
                 case "tower unit":
                 case "decor panel":
-                    model = createModel(module, dimensions, transform, material, WidgetType);
+                    model = createModel(
+                        module,
+                        dimensions,
+                        transform,
+                        material,
+                        WidgetType
+                    );
                     break;
                 case "worktop":
-                    model = createWorktopModel(dimensions, transform, material as WorktopMaterial, WidgetType);
+                    model = createWorktopModel(
+                        dimensions,
+                        transform,
+                        material as WorktopMaterial,
+                        WidgetType
+                    );
                     break;
                 default:
                     throw new Error(`Unknown widget type ${type}`);
@@ -204,13 +245,18 @@ export class Kitchen {
         }
     }
 
-
-    private spawnFromMenu(eventBus: EventBus, type: WidgetType, history: History): void {
+    private spawnFromMenu(
+        eventBus: EventBus,
+        type: WidgetType,
+        history: History
+    ): void {
         const model = DEFAULT_WIDGET_MODEL_DATA.get(type);
         assert(model, `No default model for widget type ${type}`);
         const newId = this.itemIdGenerator.getUniqueWidgetId();
         this.spawnWidget(eventBus, cloneModel(model), newId, history);
         this.addToLocalStorage();
+
+        console.log(this.widgets);
     }
 
     private getWidgetConstructor(module: string): IWidgetConstructor {
@@ -223,24 +269,37 @@ export class Kitchen {
         return WidgetConstructor;
     }
 
-    private spawnWidget(eventBus: EventBus, model: IModelData, id: number, history: History): void {
+    private spawnWidget(
+        eventBus: EventBus,
+        model: IModelData,
+        id: number,
+        history: History
+    ): void {
         const Widget = this.getWidgetConstructor(model.module);
-        const widget = new Widget(eventBus,history, model, id);
+        const widget = new Widget(eventBus, history, model, id);
         history.saveSpawnAction(ActionType.Spawn, widget.getId(), widget);
         this.basket = new Basket(this.widgets);
 
         this.widgets.push(widget);
-        this.widgets.sort((a, b): any => a.model.transform.translation.y - b.model.transform.translation.y);
+        this.widgets.sort(
+            (a, b): any =>
+                a.model.transform.translation.y -
+                b.model.transform.translation.y
+        );
     }
 
     public savePlan = async () => {
         if (!this.planName) {
-            this.planName = prompt("Please name your kitchen ", "Custom Kitchen")!;
+            this.planName = prompt(
+                "Please name your kitchen ",
+                "Custom Kitchen"
+            )!;
         }
         const http = {
-            method: 'POST', headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
             },
             body: JSON.stringify(this)
         };
@@ -253,13 +312,10 @@ export class Kitchen {
         tempWidgets.sort((a, b) => {
             if (a.getIsSelected() && !b.getIsSelected()) {
                 return -1;
-
             } else if (!a.getIsSelected() && b.getIsSelected()) {
                 return 1;
-
             } else {
                 return 0;
-
             }
         });
 
@@ -288,5 +344,4 @@ export class Kitchen {
         }
         this.addToLocalStorage();
     }
-
 }

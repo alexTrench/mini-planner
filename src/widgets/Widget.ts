@@ -1,11 +1,6 @@
-import {Transform} from "engine/Transform";
-import {Vec3} from "engine/Vec3";
-import {
-    EventBus,
-    MouseUp,
-    IMouseEventData,
-    MouseMove
-} from "engine/EventBus";
+import { Transform } from "engine/Transform";
+import { Vec3 } from "engine/Vec3";
+import { EventBus, MouseUp, IMouseEventData, MouseMove } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
 import { AxisAlignedBoundingBox } from "engine/AxisAlignedBoundingBox";
 import { IDefaultWidgetInfo } from "engine/IWidgetObject";
@@ -15,11 +10,16 @@ import {
 } from "engine/PolygonHelpers";
 import { render2dPolygon } from "engine/RenderHelpers";
 import { History, ActionType } from "engine/History";
-import { eq } from 'engine/FloatHelpers';
-import {IModelData} from "data/ModelData";
+import { eq } from "engine/FloatHelpers";
+import { IModelData } from "data/ModelData";
 
 export interface IWidgetConstructor {
-    new(eventBus: EventBus,history: History, model: IModelData, id: number): Widget;
+    new (
+        eventBus: EventBus,
+        history: History,
+        model: IModelData,
+        id: number
+    ): Widget;
 }
 
 export abstract class Widget<Model extends IModelData = IModelData> {
@@ -41,12 +41,12 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         eventBus: EventBus,
         history: History,
         public model: Model,
-        public readonly id: number,
+        public readonly id: number
     ) {
         eventBus.subscribe(MouseUp, e => this.handleMouseUp(e, history));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
 
-        const {transform, dimensions} = model;
+        const { transform, dimensions } = model;
 
         this.boundingBox = new AxisAlignedBoundingBox(
             dimensions.x / 2,
@@ -76,20 +76,15 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         return this.id;
     }
 
-
     public handleMouseDown(mouse: IMouseEventData): void {
         const { translation } = this.model.transform;
         if (this.boundingBox.containsPointInXZ(mouse.position)) {
-            const centrePoint = Vec2.New(
-                translation.x,
-               translation.z
-            );
+            const centrePoint = Vec2.New(translation.x, translation.z);
             this.mouseDragOffset = centrePoint.sub(mouse.position);
             this.mouseDragStart = centrePoint;
             this.isDragging = true;
             this.isSelected = !this.isSelected;
         }
-
     }
 
     public handleMouseUp(mouse: IMouseEventData, history: History): void {
@@ -101,14 +96,10 @@ export abstract class Widget<Model extends IModelData = IModelData> {
                 this.skipSuperMove = false;
             } else {
                 if (!eq(tx, mx) || !eq(tz, mz)) {
-                    history.saveMoveAction(
-                        ActionType.Move,
-                        this.getId(),
-                        {
-                            start: Vec2.New(mx, mz),
-                            end: Vec2.New(tx, tz)
-                        }
-                    );
+                    history.saveMoveAction(ActionType.Move, this.getId(), {
+                        start: Vec2.New(mx, mz),
+                        end: Vec2.New(tx, tz)
+                    });
                 }
             }
         }
@@ -130,10 +121,9 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         }
     }
 
-    public getType(){
+    public getType() {
         return this.type;
     }
-
 
     public setDimensions(width: number, height: number, depth: number): void {
         const { dimensions } = this.model;
@@ -171,34 +161,32 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         transformPolygonInPlace(polygon, transformMatrix);
         const { fillColour, borderColour } = this;
         //testing purposes only
-        if(this.isSelected) {
-            render2dPolygon(context, polygon, '#b3ffff', 'black');
-        }else{
+        if (this.isSelected) {
+            render2dPolygon(context, polygon, "#b3ffff", "black");
+        } else {
             render2dPolygon(context, polygon, fillColour, borderColour);
         }
-
 
         // temp drawing of bounding box - uncomment below to draw bounding box
 
         // const polygon2 = createRectanglePolygon(x / 2, z / 2);
         // const transformMatrix2 = this.boundingBox.transform.getTransformationMatrix();
         // transformPolygonInPlace(polygon2, transformMatrix2);
-        // render2dPolygon(context, polygon2, "red", "red");
+        // render2dPolygon(context, polygon2, "red", "black");
     }
-
 
     public toJSON(): IDefaultWidgetInfo {
         const { type, id, model } = this;
         const { transform, dimensions, material, module } = model;
 
-        const {x: tx, y: ty, z: tz} = transform.translation;
-        const {x: dx, y: dy, z: dz} = dimensions;
+        const { x: tx, y: ty, z: tz } = transform.translation;
+        const { x: dx, y: dy, z: dz } = dimensions;
 
         const widgetInfo: IDefaultWidgetInfo = {
             id,
             module,
-            position: {x: tx, y: ty, z: tz},
-            dimensions: {w: dx, h: dy, d: dz},
+            position: { x: tx, y: ty, z: tz },
+            dimensions: { w: dx, h: dy, d: dz },
             rotation: transform.rotation,
             type,
             material,
@@ -207,15 +195,17 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         return widgetInfo;
     }
 
-    public hasCollided(box: AxisAlignedBoundingBox): boolean {
-        return box.intersectsBoundingBox(this.boundingBox);
-    }
-
     public getBox(): AxisAlignedBoundingBox {
         return this.boundingBox;
     }
 
-    public setIsSelected(bool : boolean){
+    public setIsSelected(bool: boolean) {
         this.isSelected = bool;
+    }
+    public getPoly(): Vec2[] {
+        const { x, z } = this.model.dimensions;
+        const polygon = createRectanglePolygon(x / 2, z / 2);
+
+        return polygon;
     }
 }

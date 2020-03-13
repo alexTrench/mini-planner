@@ -6,13 +6,14 @@ import {
     MouseUp,
     MouseMove,
     KeyPress,
+    KeyUp
 } from "engine/EventBus";
 import { Vec2 } from "engine/Vec2";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Root } from "ui/Root";
-import { History } from 'engine/History'
-import { IKeyboardEventData, populateKeyboardData } from 'engine/Keyboard';
+import { History } from "engine/History";
+import { IKeyboardEventData, populateKeyboardData } from "engine/Keyboard";
 
 /**
  * Creates the div element for the React components
@@ -39,14 +40,18 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     };
 
     const keyboardEventData: IKeyboardEventData = {
-        key: '',
+        key: "",
         ctrl: false,
         alt: false,
         shift: false,
-        cmd: false,
+        cmd: false
     };
 
-    const mouseEventHelper = (eventType: any, mouseEventData: IMouseEventData, mouseEvent: MouseEvent) => {
+    const mouseEventHelper = (
+        eventType: any,
+        mouseEventData: IMouseEventData,
+        mouseEvent: MouseEvent
+    ) => {
         const rect = canvas.getBoundingClientRect();
         mouseEventData.position.x = mouseEvent.clientX - rect.left;
         mouseEventData.position.z = mouseEvent.clientY - rect.top;
@@ -54,21 +59,27 @@ function createAndInitialiseCanvas(eventBus: EventBus): HTMLCanvasElement {
     };
 
     canvas.addEventListener("mousedown", mouseEvent => {
-        mouseEventHelper(MouseDown, mouseEventData, mouseEvent)
+        mouseEventHelper(MouseDown, mouseEventData, mouseEvent);
     });
 
     canvas.addEventListener("mouseup", mouseEvent => {
-        mouseEventHelper(MouseUp, mouseEventData, mouseEvent)
+        mouseEventHelper(MouseUp, mouseEventData, mouseEvent);
     });
 
     canvas.addEventListener("mousemove", mouseEvent => {
-        mouseEventHelper(MouseMove, mouseEventData, mouseEvent)
+        mouseEventHelper(MouseMove, mouseEventData, mouseEvent);
     });
 
     window.addEventListener("keydown", e => {
         e.preventDefault();
         populateKeyboardData(e, keyboardEventData);
         eventBus.publish(KeyPress, keyboardEventData);
+    });
+
+    window.addEventListener("keyup", e => {
+        e.preventDefault();
+        populateKeyboardData(e, keyboardEventData);
+        eventBus.publish(KeyUp, keyboardEventData);
     });
 
     return canvas;
