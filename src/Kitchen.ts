@@ -3,7 +3,7 @@ import { ItemIdGenerator } from "engine/ItemIdGenerator";
 import { IDefaultWidgetInfo, IKitchenInfo } from "engine/IWidgetObject";
 import { History, ActionType } from "engine/History";
 import { IKeyboardEventData } from 'engine/Keyboard';
-import { EventBus, MouseUp,  NewPlan, SavePlan, KeyPress,SpawnFromLocalStore, SpawnWidget, DeleteWidget } from "engine/EventBus";
+import { EventBus, MouseUp, MouseDown, NewPlan, SavePlan, KeyPress, SpawnFromLocalStore, SpawnWidget, DeleteWidget, IMouseEventData } from "engine/EventBus";
 import { assert } from "utility/Assert";
 import {IWidgetConstructor, Widget} from "widgets/Widget";
 import {
@@ -19,6 +19,7 @@ import {Transform} from "engine/Transform";
 import {Vec3} from "engine/Vec3";
 import {WorktopMaterial} from "data/WorktopMaterialBorderDisplayColour";
 
+
 export class Kitchen {
     private itemIdGenerator = new ItemIdGenerator();
     private widgets = new Array<Widget>();
@@ -32,6 +33,7 @@ export class Kitchen {
         eventBus.subscribe(DeleteWidget, this.deleteWidget.bind(this));
         eventBus.subscribe(NewPlan, this.newPlan.bind(this));
         eventBus.subscribe(KeyPress, e => this.handleKeyPress(e, history));
+        eventBus.subscribe(MouseDown, this.widgetDragStart.bind(this));
         this.itemIdGenerator.setMaxId(this.widgets);
         eventBus.subscribe(SpawnFromLocalStore, () => this.spawnFromLocalStorage(eventBus, history));
         eventBus.subscribe(SpawnWidget, type => this.spawnFromMenu(eventBus, type, history));
@@ -54,9 +56,6 @@ export class Kitchen {
             }
         }
     }
-    public addToWidgets(newWidget: Widget): void {
-            this.widgets.push(newWidget);
-    }
 
     public render(context: CanvasRenderingContext2D): void {
         for (const widget of this.widgets) {
@@ -64,16 +63,36 @@ export class Kitchen {
         }
     }
 
-    public handleKeyPress(keyPress: IKeyboardEventData, history: History): void {
+    public widgetDragStart(mouse: IMouseEventData): void {
+        const hoveredWidgets = [];
+
+        for (const widget of this.widgets) {
+            if (widget.boundingBox.containsPointInXZ(mouse.position)) {
+                hoveredWidgets.push(widget);
+            }
+            widget.setIsSelected(false);
+        }
+
+        const highestWidget = hoveredWidgets.pop()!;
+
+        if (highestWidget) {
+            highestWidget.handleMouseDown(mouse);
+        }
+    }
+
+    public handleKeyPress(
+        keyPress: IKeyboardEventData,
+        history: History
+    ): void {
         const { key, ctrl, shift, cmd } = keyPress;
 
-        const undoKeySequence = ((ctrl || cmd) && key === "z");
+        const undoKeySequence = (ctrl || cmd) && key === "z";
         if (undoKeySequence) {
             history.undo(this.widgets);
         }
 
-        const redoWindowsKeySequence = (ctrl && key === "y");
-        const redoMacOSXKeySequence = (shift && cmd && key === "Z");
+        const redoWindowsKeySequence = ctrl && key === "y";
+        const redoMacOSXKeySequence = shift && cmd && key === "Z";
         const redoKeySequence = redoWindowsKeySequence || redoMacOSXKeySequence;
         if (redoKeySequence) {
             history.redo(this.widgets);
@@ -210,7 +229,8 @@ export class Kitchen {
         history.saveSpawnAction(ActionType.Spawn, widget.getId(), widget);
         this.basket = new Basket(this.widgets);
 
-        this.addToWidgets(widget);
+        this.widgets.push(widget);
+        this.widgets.sort((a, b): any => a.model.transform.translation.y - b.model.transform.translation.y);
     }
 
     public savePlan = async () => {

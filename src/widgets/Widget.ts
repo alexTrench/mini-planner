@@ -2,7 +2,6 @@ import {Transform} from "engine/Transform";
 import {Vec3} from "engine/Vec3";
 import {
     EventBus,
-    MouseDown,
     MouseUp,
     IMouseEventData,
     MouseMove
@@ -44,7 +43,6 @@ export abstract class Widget<Model extends IModelData = IModelData> {
         public model: Model,
         public readonly id: number,
     ) {
-        eventBus.subscribe(MouseDown, this.handleMouseDown.bind(this));
         eventBus.subscribe(MouseUp, e => this.handleMouseUp(e, history));
         eventBus.subscribe(MouseMove, this.handleMouseMove.bind(this));
 
@@ -215,5 +213,9 @@ export abstract class Widget<Model extends IModelData = IModelData> {
 
     public getBox(): AxisAlignedBoundingBox {
         return this.boundingBox;
+    }
+
+    public setIsSelected(bool : boolean){
+        this.isSelected = bool;
     }
 }

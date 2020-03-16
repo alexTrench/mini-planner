@@ -38,7 +38,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
     private topBoxSelected: boolean = false;
     private bottomBoxSelected: boolean = false;
     private maxSize: number = 5000;
-    private minSize: number = 50;
+    private minSize: number = 200;
     private scale: number = 5;
     private previousDimension: Vec2 = Vec2.Zero();
 
@@ -61,17 +61,17 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.topBoundingBox = this.createHandleBoundingBox(
             transformX,
             transformY,
-            transformZ - (dimensionZ / 2) * scaleY
+            transformZ - (dimensionZ / 2 - this.resizingWidgetSize) * scaleY
         );
 
         this.rightBoundingBox = this.createHandleBoundingBox(
-            transformX + (dimensionX / 2) * scaleX,
+            transformX + (dimensionX / 2 - this.resizingWidgetSize) * scaleX,
             transformY,
             transformZ
         );
 
         this.leftBoundingBox = this.createHandleBoundingBox(
-            transformX - (dimensionX / 2) * scaleX,
+            transformX - (dimensionX / 2 - this.resizingWidgetSize) * scaleX,
             transformY,
             transformZ
         );
@@ -79,7 +79,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.bottomBoundingBox = this.createHandleBoundingBox(
             transformX,
             transformY,
-            transformZ + (dimensionZ / 2) * scaleY
+            transformZ + (dimensionZ / 2 - this.resizingWidgetSize) * scaleY
         );
 
         this.allBoundingBoxes = [];
@@ -170,8 +170,8 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
                 ActionType.Resize,
                 this.getId(),
                 {
-                        start: Vec2.New(mx, mz),
-                        end: Vec2.New(tx, tz)
+                    start: Vec2.New(mx, mz),
+                    end: Vec2.New(tx, tz)
                 },
                 {
                     start: Vec2.New(px, pz),
@@ -190,13 +190,7 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.newPointY = mouse.position.z;
         //combines all the potential drag events into one tidy function
         this.drag(mouse);
-        if (this.isDragging) {
-            this.setPosition(
-                mouse.position.x + this.mouseDragOffset.x,
-                this.model.transform.translation.y,
-                mouse.position.z + this.mouseDragOffset.z
-            );
-        }
+        super.handleMouseMove(mouse);
     }
 
     private checkLeft(mouse: IMouseEventData): void {
@@ -378,22 +372,22 @@ export class WorktopWidget extends Widget<IWorktopModelData> {
         this.topBoundingBox.setPosition(
             x,
             y,
-            z - (this.model.dimensions.z / 2) * this.model.transform.scale.z
+            z - (this.model.dimensions.z / 2  - this.resizingWidgetSize) * this.model.transform.scale.z
         );
         this.rightBoundingBox.setPosition(
-            x + (this.model.dimensions.x / 2) * this.model.transform.scale.x,
+            x + (this.model.dimensions.x / 2 - this.resizingWidgetSize) * this.model.transform.scale.x,
             y,
             z
         );
         this.leftBoundingBox.setPosition(
-            x - (this.model.dimensions.x / 2) * this.model.transform.scale.x,
+            x - (this.model.dimensions.x / 2 - this.resizingWidgetSize) * this.model.transform.scale.x,
             y,
             z
         );
         this.bottomBoundingBox.setPosition(
             x,
             y,
-            z + (this.model.dimensions.z / 2) * this.model.transform.scale.z
+            z + (this.model.dimensions.z / 2 - this.resizingWidgetSize) * this.model.transform.scale.z
         );
     }
 }
